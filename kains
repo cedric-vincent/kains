@@ -18,7 +18,7 @@ sub MAIN() {
 	}
 
 	sub unshare-mount-namespace() {
-		sub unshare(int --> int) is native is symbol('unshare') { * }
+		sub unshare(int --> int) is native { * }
 
 		constant CLONE_NEWNS	:= 0x00020000;
 		constant CLONE_NEWUSER	:= 0x10000000;
@@ -27,7 +27,7 @@ sub MAIN() {
 	}
 
 	sub mount-rbind(Str :$source, Str :$target) {
-		sub mount(Str, Str, int, int, int --> int) is native is symbol('mount') { * }
+		sub mount(Str, Str, int, int, int --> int) is native { * }
 
 		constant MS_PRIVATE	:= 0x40000;
 		constant MS_BIND	:= 0x1000;
@@ -36,9 +36,21 @@ sub MAIN() {
 		check-native-error(mount($source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0));
 	}
 
+	sub change-rootfs(Str $new-rootfs) {
+		sub chroot(Str --> int) is native { * }
+
+		check-native-error(chroot($new-rootfs));
+	}
+
 	unshare-mount-namespace();
 
 	for @bindings {
 		mount-rbind(:source($_), :target("$rootfs/$_"))
 	}
+
+	change-rootfs($rootfs);
+
+	chdir('/');
+
+	run('/bin/bash');
 }
