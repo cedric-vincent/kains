@@ -4,6 +4,9 @@ use v6;
 use NativeCall;
 
 sub MAIN() {
+	my $rootfs	:= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
+	my @bindings	:= < /dev /proc >;
+
 	sub check-native-error(int $status) {
 		my $caller_name := callframe(1).my.<&?ROUTINE>.name; # caller() NYI
 
@@ -14,14 +17,28 @@ sub MAIN() {
 				  ~ "$caller_name: { strerror($errno) }"
 	}
 
-	sub unshare(int $flags)	{
-		sub unshare-native(int --> int) is native is symbol('unshare') { * }
+	sub unshare-mount-namespace() {
+		sub unshare(int --> int) is native is symbol('unshare') { * }
 
-		check-native-error(unshare-native($flags));
+		constant CLONE_NEWNS	:= 0x00020000;
+		constant CLONE_NEWUSER	:= 0x10000000;
+
+		check-native-error(unshare(CLONE_NEWUSER +| CLONE_NEWNS));
 	}
 
-	constant CLONE_NEWNS	:= 0x00020000;
-	constant CLONE_NEWUSER	:= 0x10000000;
+	sub mount-rbind(Str :$source, Str :$target) {
+		sub mount(Str, Str, int, int, int --> int) is native is symbol('mount') { * }
 
-	unshare(CLONE_NEWUSER +| CLONE_NEWNS);
+		constant MS_PRIVATE	:= 0x40000;
+		constant MS_BIND	:= 0x1000;
+		constant MS_REC		:= 0x4000;
+
+		check-native-error(mount($source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0));
+	}
+
+	unshare-mount-namespace();
+
+	for @bindings {
+		mount-rbind(:source($_), :target("$rootfs/$_"))
+	}
 }
