@@ -7,12 +7,23 @@ sub MAIN() {
 	my $rootfs	:= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
 	my @bindings	:= < /dev /proc >;
 
+	class X::Errno is Exception {
+		has $.function;
+		has @.args;
+		has $.errno;
+
+		method message() {
+			sub strerror(int --> Str) is native { * }
+
+			$.function.name ~ '(' ~ @.args.join(', ') ~ '): ' ~ strerror($.errno);
+		}
+	}
+
 	sub raise-errno-on(Callable $condition, $function, *@args) {
 		my $errno := cglobal('libc.so.6', 'errno', int32);
-		sub strerror(int --> Str) is native { * }
 
 		if $condition($function(|@args)) {
-			die "{ $function.name }: { strerror($errno) }"
+			die X::Errno.new(:$function, :@args, :$errno);
 		}
 	}
 
