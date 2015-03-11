@@ -7,14 +7,13 @@ sub MAIN() {
 	my $rootfs	:= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
 	my @bindings	:= < /dev /proc >;
 
-	sub check-native-error(int $status) {
-		my $caller_name := callframe(1).my.<&?ROUTINE>.name; # caller() NYI
-
+	sub raise-errno-on(Callable $condition, $function, *@args) {
 		my $errno := cglobal('libc.so.6', 'errno', int32);
 		sub strerror(int --> Str) is native { * }
 
-		$status >= 0 or die "Error calling native function: "
-				  ~ "$caller_name: { strerror($errno) }"
+		if $condition($function(|@args)) {
+			die "{ $function.name }: { strerror($errno) }"
+		}
 	}
 
 	sub unshare-mount-namespace() {
@@ -23,7 +22,7 @@ sub MAIN() {
 		constant CLONE_NEWNS	:= 0x00020000;
 		constant CLONE_NEWUSER	:= 0x10000000;
 
-		check-native-error(unshare(CLONE_NEWUSER +| CLONE_NEWNS));
+		raise-errno-on(* < 0, &unshare, CLONE_NEWUSER +| CLONE_NEWNS);
 	}
 
 	sub mount-rbind(Str :$source, Str :$target) {
@@ -33,13 +32,13 @@ sub MAIN() {
 		constant MS_BIND	:= 0x1000;
 		constant MS_REC		:= 0x4000;
 
-		check-native-error(mount($source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0));
+		raise-errno-on(* < 0, &mount, $source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0);
 	}
 
 	sub change-rootfs(Str $new-rootfs) {
 		sub chroot(Str --> int) is native { * }
 
-		check-native-error(chroot($new-rootfs));
+		raise-errno-on(* < 0, &chroot, $new-rootfs);
 	}
 
 	unshare-mount-namespace();
