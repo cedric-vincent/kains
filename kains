@@ -3,9 +3,9 @@
 use v6;
 use NativeCall;
 
-sub MAIN() {
-	my $rootfs	::= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
-	my @bindings	::= < /dev /proc >;
+
+sub MAIN(Str :$rootfs!) {
+	my @bindings ::= < /dev /sys /proc /tmp >;
 
 	class X::Errno is Exception {
 		has $.function;
