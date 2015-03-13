@@ -4,8 +4,8 @@ use v6;
 use NativeCall;
 
 sub MAIN() {
-	my $rootfs	:= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
-	my @bindings	:= < /dev /proc >;
+	my $rootfs	::= '/usr/local/cedric/rootfs/ubuntu-core-14.10-core-amd64';
+	my @bindings	::= < /dev /proc >;
 
 	class X::Errno is Exception {
 		has $.function;
@@ -15,12 +15,12 @@ sub MAIN() {
 		method message() {
 			sub strerror(int --> Str) is native { * }
 
-			$.function.name ~ '(' ~ @.args.join(', ') ~ '): ' ~ strerror($.errno);
+			$!function.name ~ '(' ~ @!args.join(', ') ~ '): ' ~ strerror($!errno);
 		}
 	}
 
 	sub raise-errno-on(Callable $condition, $function, *@args) {
-		my $errno := cglobal('libc.so.6', 'errno', int32);
+		my $errno ::= cglobal('libc.so.6', 'errno', int32);
 
 		if $condition($function(|@args)) {
 			die X::Errno.new(:$function, :@args, :$errno);
@@ -30,8 +30,8 @@ sub MAIN() {
 	sub unshare-mount-namespace() {
 		sub unshare(int --> int) is native { * }
 
-		constant CLONE_NEWNS	:= 0x00020000;
-		constant CLONE_NEWUSER	:= 0x10000000;
+		constant CLONE_NEWNS	::= 0x00020000;
+		constant CLONE_NEWUSER	::= 0x10000000;
 
 		raise-errno-on(* < 0, &unshare, CLONE_NEWUSER +| CLONE_NEWNS);
 	}
@@ -39,9 +39,9 @@ sub MAIN() {
 	sub mount-rbind(Str :$source, Str :$target) {
 		sub mount(Str, Str, int, int, int --> int) is native { * }
 
-		constant MS_PRIVATE	:= 0x40000;
-		constant MS_BIND	:= 0x1000;
-		constant MS_REC		:= 0x4000;
+		constant MS_PRIVATE	::= 0x40000;
+		constant MS_BIND	::= 0x1000;
+		constant MS_REC		::= 0x4000;
 
 		raise-errno-on(* < 0, &mount, $source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0);
 	}
