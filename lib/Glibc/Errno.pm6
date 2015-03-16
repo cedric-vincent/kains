@@ -42,7 +42,7 @@ class X::Errno is Exception is export {
 	has @.args;
 	has $.errno;
 
-	method message() {
+	method message {
 		sub strerror(int $errno) returns Str is native { * }
 
 		$!function.name ~ '(' ~ @!args.join(', ') ~ '): ' ~ strerror($!errno);
