@@ -1,79 +1,32 @@
 #!/usr/bin/env perl6
 
 use v6;
-use NativeCall;
+use Glibc::Linux :unshare, :mount, :chroot;
 
+my $rootfs	::= '/usr/local/cedric/rootfs/stage3-amd64-hardened+nomultilib-20141120';
+my @bindings	::= < /dev /sys /proc /tmp >;
 
-sub MAIN(Str :$rootfs!) {
-	my @bindings ::= < /dev /sys /proc /tmp >;
+unshare(CLONE_NEWUSER +| CLONE_NEWNS);
 
-	class X::Errno is Exception {
-		has $.function;
-		has @.args;
-		has $.errno;
+for @bindings {
+	mount($_, "$rootfs/$_", '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
+}
 
-		method message() {
-			sub strerror(int --> Str) is native { * }
+chroot($rootfs);
 
-			$!function.name ~ '(' ~ @!args.join(', ') ~ '): ' ~ strerror($!errno);
-		}
-	}
+chdir('/');
 
-	sub raise-errno-on(Callable $condition, $function, *@args) {
-		my $errno ::= cglobal('libc.so.6', 'errno', int32);
+run('/bin/bash');
 
-		if $condition($function(|@args)) {
-			die X::Errno.new(:$function, :@args, :$errno);
-		}
-	}
+CATCH {
+	use Glibc::Errno;
 
-	sub unshare-mount-namespace() {
-		sub unshare(int --> int) is native { * }
+	when X::Errno {
+		say "FATAL: ", .message();
 
-		constant CLONE_NEWNS	::= 0x00020000;
-		constant CLONE_NEWUSER	::= 0x10000000;
-
-		raise-errno-on(* < 0, &unshare, CLONE_NEWUSER +| CLONE_NEWNS);
-	}
-
-	sub mount-rbind(Str :$source, Str :$target) {
-		sub mount(Str, Str, int, int, int --> int) is native { * }
-
-		constant MS_PRIVATE	::= 0x40000;
-		constant MS_BIND	::= 0x1000;
-		constant MS_REC		::= 0x4000;
-
-		raise-errno-on(* < 0, &mount, $source, $target, 0, MS_PRIVATE +| MS_BIND +| MS_REC, 0);
-	}
-
-	sub change-rootfs(Str $new-rootfs) {
-		sub chroot(Str --> int) is native { * }
-
-		raise-errno-on(* < 0, &chroot, $new-rootfs);
-	}
-
-	unshare-mount-namespace();
-
-	for @bindings {
-		mount-rbind(:source($_), :target("$rootfs/$_"))
-	}
-
-	change-rootfs($rootfs);
-
-	chdir('/');
-
-	run('/bin/bash');
-
-	CATCH {
-		when X::Errno {
-			constant EPERM ::= 1;
-
-			say "FATAL: ", .message();
-
-			if .errno == EPERM {
-				say "INFO: It seems your system doesn't support user namespaces; "
-				  ~ "you might want to try PRoot instead: http://proot.me";
-			}
+		if .errno == EPERM {
+			say "INFO: It seems your system doesn't support user namespaces; "
+			  ~ "you might want to try PRoot instead: http://proot.me";
 		}
 	}
 }
