@@ -1,5 +1,8 @@
 module Kains;
 
+use Kains::Config;
+use Kains::Command-line;
+
 use Glibc::Linux :unshare, :mount, :chroot;
 use Glibc :getuid, :getgid;
 
@@ -18,27 +21,24 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 	CATCH {	default { say "WARNING: can't map group identity: { .message }" } }
 }
 
-our sub start {
-	my $rootfs	::= '/usr/local/cedric/rootfs/stage3-amd64-hardened+nomultilib-20141120';
-	my @bindings	::= < /dev /sys /proc /tmp /etc/passwd >, %*ENV<HOME>;
-
+sub launch-command-in-new-namespace(Kains::Config $config) {
 	my $old-uid = getuid;
 	my $old-gid = getgid;
 
 	unshare(CLONE_NEWUSER +| CLONE_NEWNS);
 
-	set-uid-mapping(:$old-uid, :new-uid(0));
-	set-gid-mapping(:$old-gid, :new-gid(0));
+	set-uid-mapping(:$old-uid, :new-uid($config.root-id ?? 0 !! $old-uid));
+	set-gid-mapping(:$old-gid, :new-gid($config.root-id ?? 0 !! $old-gid));
 
-	for @bindings {
-		mount($_, "$rootfs/$_", '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
+	for $config.bindings {
+		mount(.key, $config.rootfs ~ "/" ~ .value, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
 	}
 
-	chroot($rootfs);
+	chroot($config.rootfs);
 
 	chdir('/');
 
-	run('/bin/bash');
+	run(|$config.command);
 
 	CATCH {
 		use Glibc::Errno;
@@ -50,6 +50,19 @@ our sub start {
 				say "INFO: it seems your system doesn't support user namespaces; "
 				  ~ "you might want to try PRoot instead: http://proot.me";
 			}
+		}
+	}
+}
+
+our sub main() {
+	my $config = Kains::Command-line::parse(@*ARGS);
+
+	launch-command-in-new-namespace($config);
+
+	CATCH {
+		when X::Command-line {
+			$*ERR.say: .message;
+			$*ERR.say: 'Please have a look at the --help option';
 		}
 	}
 }
