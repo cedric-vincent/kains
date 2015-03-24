@@ -46,7 +46,8 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 		when X::Errno {
 			say 'FATAL: ', .message;
 
-			if .errno == EPERM {
+			if .errno == EPERM
+			or .errno == EINVAL and .function.name eq 'unshare' {
 				say "INFO: it seems your system doesn't support user namespaces; "
 				  ~ "you might want to try PRoot instead: http://proot.me";
 			}

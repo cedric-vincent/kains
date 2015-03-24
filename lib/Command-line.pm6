@@ -45,7 +45,8 @@ class Command-line::Interface {
 				$index += $option.callback.count;
 
 				@parameters = @arguments[$old-index + 1 ... $index];
-				die 'missing parameter' if ! all(@parameters».defined) or @parameters == 0;
+				die 'missing parameter' if ! all(@parameters».defined)
+							or @parameters == 0;
 			}
 
 			$option.callback.(|@parameters);
