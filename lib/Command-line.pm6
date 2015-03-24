@@ -28,7 +28,7 @@ class X::Command-line is Exception {
 class Command-line::Interface {
 	has Command-line::Option @.options;
 
-	method parse(@arguments) returns int {
+	method parse(@arguments --> int) {
 		my $index = 0;
 		loop (; $index < @arguments; $index++) {
 			my $current-argument ::= @arguments[$index];
