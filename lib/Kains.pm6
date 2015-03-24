@@ -64,7 +64,14 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 our sub start(--> Int) {
 	my $config = Kains::Command-line::parse(@*ARGS);
 
-	return launch-command-in-new-namespace($config).exit;
+	my $status = launch-command-in-new-namespace($config).exit;
+	if $status == -1 {
+		die X::Kains.new(message => qq:to/END/
+			"{ $config.command[0] }" can't be found or can't be executed.
+			END
+		);
+	}
+	return $status;
 
 	CATCH {
 		when X::Command-line {
