@@ -3,6 +3,73 @@ module Kains::Command-line;
 use Kains::Config;
 use Command-line;
 
+=begin R-bindings
+=item /etc/host.conf
+=item /etc/hosts
+=item /etc/hosts.equiv
+=item /etc/mtab
+=item /etc/netgroup
+=item /etc/networks
+=item /etc/passwd
+=item /etc/group
+=item /etc/nsswitch.conf
+=item /etc/resolv.conf
+=item /etc/localtime
+=item /dev/
+=item /sys/
+=item /proc/
+=item /tmp/
+=item $HOME
+=end R-bindings
+
+=begin R-bindings
+=item /etc/host.conf
+=item /etc/hosts
+=item /etc/hosts.equiv
+=item /etc/mtab
+=item /etc/netgroup
+=item /etc/networks
+=item /etc/passwd
+=item /etc/group
+=item /etc/nsswitch.conf
+=item /etc/resolv.conf
+=item /etc/localtime
+=item /dev/
+=item /sys/
+=item /proc/
+=item /tmp/
+=item $HOME
+=end R-bindings
+
+=begin S-bindings
+=item /etc/host.conf
+=item /etc/hosts
+=item /etc/nsswitch.conf
+=item /dev/
+=item /sys/
+=item /proc/
+=item /tmp/
+=item $HOME
+=end S-bindings
+
+sub add-named-bindings(Kains::Config $config, Str $name) {
+	my $doc = $=pod.first: *.name === $name ~ '-bindings';
+
+	for $doc.contents {
+		next if $_ !~~ Pod::Item;
+		warn if .contents != 1;
+		warn if .contents[0] !~~ Pod::Block::Para;
+
+		my Str $path = ~$_.contents[0].contents;
+
+		if $path ~~ m/\$(.*)/ {
+			$path = %*ENV{$0};
+		}
+
+		$config.add-binding($path);
+	}
+}
+
 our sub parse(@arguments --> Kains::Config) {
 	my Kains::Config $config .= new;
 
@@ -16,7 +83,7 @@ our sub parse(@arguments --> Kains::Config) {
 		),
 		Command-line::Option.new(
 			switches	=> < -b --bind -m --mount >,
-			callback	=> sub { $config.add-binding($^a, $^a) },
+			callback	=> sub { $config.add-binding($^a) },
 			examples	=> ( '/proc', '/dev', %*ENV<HOME> ),
 		),
 		Command-line::Option.new(
@@ -36,6 +103,17 @@ our sub parse(@arguments --> Kains::Config) {
 		Command-line::Option.new(
 			switches	=> < -0 --root-id >,
 			callback	=> sub { $config.root-id = True },
+		),
+		Command-line::Option.new(
+			switches	=> < -R >,
+			callback	=> sub { $config.set-rootfs($^a);
+						 add-named-bindings($config, 'R') },
+		),
+		Command-line::Option.new(
+			switches	=> < -S >,
+			callback	=> sub { $config.set-rootfs($^a);
+						 add-named-bindings($config, 'S');
+						 $config.root-id = True },
 		),
 		Command-line::Option.new(
 			switches	=> < -h --help --usage >,

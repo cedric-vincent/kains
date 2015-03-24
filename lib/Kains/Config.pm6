@@ -2,7 +2,7 @@ class Kains::Config {
 	has Str $.rootfs	= '/';
 	has Enum @.bindings	= ();
 	has Str $.cwd		= ~$*CWD;
-	has Bool $.root-id	= False;
+	has Bool $.root-id is rw = False;
 	has Str @.command	= < /bin/sh -l >;
 
 	sub check-directory($path) {
@@ -19,8 +19,8 @@ class Kains::Config {
 		$!rootfs = $path;
 	}
 
-	multi method add-binding(Str $host-path, Str $guest-path) {
-		check-directory($host-path);
+	multi method add-binding(Str $host-path, Str $guest-path = $host-path) {
+		die qq/"$host-path" doesn't exist/ if !$host-path.IO.e;
 
 		# $guest-path can't be checked now because symlinks
 		# have to be resolved respectively to the guest
