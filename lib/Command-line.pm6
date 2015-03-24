@@ -31,7 +31,7 @@ class Command-line::Interface {
 	method parse(@arguments --> int) {
 		my $index = 0;
 		loop (; $index < @arguments; $index++) {
-			my $current-argument ::= @arguments[$index];
+			my $current-argument = @arguments[$index];
 
 			my $option = @.options.first({ any(.switches) === $current-argument });
 			if ! $option.defined {
