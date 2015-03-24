@@ -54,7 +54,7 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 	}
 }
 
-our sub main(--> Int) {
+our sub start(--> Int) {
 	my $config = Kains::Command-line::parse(@*ARGS);
 
 	return launch-command-in-new-namespace($config).exit;
