@@ -39,23 +39,29 @@ constant ERANGE		is export	::= 34;
 
 class X::Errno is Exception is export {
 	has $.function;
-	has @.args;
+	has @.arguments;
 	has $.errno;
 
 	method message {
 		sub strerror(int $errno --> Str) is native { * }
 
-		$!function.name ~ '(' ~ @!args.join(', ') ~ '): ' ~ strerror($!errno);
+		my @arguments = @!arguments.map: {
+			when Str { qq/"$_"/		}
+			when Int { '0x' ~ $_.base(16)	}
+			default	 { $_			}
+		}
+
+		$!function.name ~ '(' ~ @arguments.join(', ') ~ '): ' ~ strerror($!errno);
 	}
 }
 
 our $errno is export ::= cglobal('libc.so.6', 'errno', int);
 
-sub raise-errno-on(Callable $condition, $function, *@args) is export {
-	my $result = $function(|@args);
+sub raise-errno-on(Callable $condition, $function, *@arguments) is export {
+	my $result = $function(|@arguments);
 
 	if $condition($result) {
-		die X::Errno.new(:$function, :@args, :$errno);
+		die X::Errno.new(:$function, :@arguments, :$errno);
 	}
 
 	return $result;

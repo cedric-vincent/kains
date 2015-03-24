@@ -12,7 +12,7 @@ class X::Command-line is Exception {
 	has $.option;
 
 	method message {
-		my $message = "Error while processing $!argument option: $!message";
+		my Str $message = "Error while processing $!argument option: $!message";
 
 		if $!option.defined {
 			for $!option.examples {

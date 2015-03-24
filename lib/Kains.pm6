@@ -46,7 +46,7 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 		use Glibc::Errno;
 
 		when X::Errno {
-			my $message = "Error: { .message }\n";
+			my Str $message = "Error: { .message }\n";
 
 			if .errno == EPERM
 			or .errno == EINVAL and .function.name eq 'unshare' {
