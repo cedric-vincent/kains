@@ -9,7 +9,7 @@ use Glibc :getuid, :getgid;
 sub set-uid-mapping(int :$old-uid, int :$new-uid) {
 	spurt('/proc/self/uid_map', "$new-uid $old-uid 1");
 
-	CATCH {	default { say "WARNING: can't map user identity: { .message }" } }
+	CATCH {	default { note "Warning: can't map user identity: { .message }" } }
 }
 
 sub set-gid-mapping(int :$old-gid, int :$new-gid) {
@@ -18,8 +18,10 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 
 	spurt('/proc/self/gid_map', "$new-gid $old-gid 1");
 
-	CATCH {	default { say "WARNING: can't map group identity: { .message }" } }
+	CATCH {	default { note "Warning: can't map group identity: { .message }" } }
 }
+
+class X::Kains is Exception { has $.message };
 
 sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 	my $old-uid = getuid;
@@ -44,13 +46,17 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 		use Glibc::Errno;
 
 		when X::Errno {
-			say 'FATAL: ', .message;
+			my $message = "Error: { .message }\n";
 
 			if .errno == EPERM
 			or .errno == EINVAL and .function.name eq 'unshare' {
-				say "INFO: it seems your system doesn't support user namespaces; "
-				  ~ "you might want to try PRoot instead: http://proot.me";
+				$message ~= q:to/END/;
+					It seems your system doesn't support user namespaces.
+					You might want to try PRoot instead: http://proot.me.
+					END
 			}
+
+			die X::Kains.new(:$message);
 		}
 	}
 }
@@ -62,8 +68,11 @@ our sub start(--> Int) {
 
 	CATCH {
 		when X::Command-line {
-			$*ERR.say: .message;
-			$*ERR.say: 'Please have a look at the --help option';
+			die X::Kains.new(message => qq:to/END/
+				{ .message }
+				Please have a look at the --help option
+				END
+			);
 		}
 	}
 }

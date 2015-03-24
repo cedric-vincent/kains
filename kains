@@ -5,3 +5,5 @@ use lib 'lib';
 use Kains;
 
 exit Kains::start();
+
+CATCH { when X::Kains { note .message } }
