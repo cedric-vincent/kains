@@ -21,7 +21,7 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 	CATCH {	default { say "WARNING: can't map group identity: { .message }" } }
 }
 
-sub launch-command-in-new-namespace(Kains::Config $config) {
+sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 	my $old-uid = getuid;
 	my $old-gid = getgid;
 
@@ -38,7 +38,7 @@ sub launch-command-in-new-namespace(Kains::Config $config) {
 
 	chdir('/');
 
-	run(|$config.command);
+	return run(|$config.command);
 
 	CATCH {
 		use Glibc::Errno;
@@ -54,10 +54,10 @@ sub launch-command-in-new-namespace(Kains::Config $config) {
 	}
 }
 
-our sub main() {
+our sub main(--> Int) {
 	my $config = Kains::Command-line::parse(@*ARGS);
 
-	launch-command-in-new-namespace($config);
+	return launch-command-in-new-namespace($config).exit;
 
 	CATCH {
 		when X::Command-line {

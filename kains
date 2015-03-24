@@ -4,4 +4,4 @@ use v6;
 use lib 'lib';
 use Kains;
 
-Kains::main();
+exit Kains::main();
