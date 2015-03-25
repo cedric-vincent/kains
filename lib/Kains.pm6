@@ -38,7 +38,7 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 
 	chroot($config.rootfs);
 
-	chdir('/');
+	chdir($config.cwd);
 
 	return run(|$config.command);
 

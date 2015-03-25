@@ -94,7 +94,7 @@ our sub parse(@arguments --> Kains::Config) {
 					     '/bin/bash /bin/sh' ),
 		),
 		Command-line::Option.new(
-			switches	=> < -w --pwd --cwd >,
+			switches	=> < -w --pwd --cwd --working-directory >,
 			callback	=> sub { $config.set-cwd($^a) },
 			examples	=> ( '/tmp',
 					     $config.cwd ~ '  (first default)',
