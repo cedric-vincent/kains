@@ -105,6 +105,10 @@ our sub parse(@arguments --> Kains::Config) {
 			callback	=> sub { $config.root-id = True },
 		),
 		Command-line::Option.new(
+			switches	=> < --32 --32bit --32bit-mode >,
+			callback	=> sub { $config.mode32 = True },
+		),
+		Command-line::Option.new(
 			switches	=> < -R >,
 			callback	=> sub { $config.set-rootfs($^a);
 						 add-named-bindings($config, 'R') },

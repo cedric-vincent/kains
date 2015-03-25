@@ -3,6 +3,7 @@ class Kains::Config {
 	has Enum @.bindings	= ();
 	has Str $.cwd		= ~$*CWD;
 	has Bool $.root-id is rw = False;
+	has Bool $.mode32 is rw  = False;
 	has Str @.command	= < /bin/sh -l >;
 
 	sub check-directory($path) {

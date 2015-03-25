@@ -3,7 +3,7 @@ module Kains;
 use Kains::Config;
 use Kains::Command-line;
 
-use Glibc::Linux :unshare, :mount, :chroot;
+use Glibc::Linux :unshare, :mount, :chroot, :personality;
 use Glibc :getuid, :getgid;
 
 sub set-uid-mapping(int :$old-uid, int :$new-uid) {
@@ -39,6 +39,8 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 	chroot($config.rootfs);
 
 	chdir($config.cwd);
+
+	personality(PER_LINUX32) if $config.mode32;
 
 	return run(|$config.command);
 

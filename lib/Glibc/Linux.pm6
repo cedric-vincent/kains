@@ -18,6 +18,11 @@ sub chroot(Str $path) is export(:chroot) {
 	raise-errno-on(* < 0, &chroot, $path);
 }
 
+sub personality(int $flags --> int) is export(:chroot) {
+	sub personality(int --> int) is native { * }
+	raise-errno-on(* < 0, &personality, $$flags);
+}
+
 constant CLONE_VM	is export(:clone, :unshare)	= 0x00000100;
 constant CLONE_FS	is export(:clone, :unshare)	= 0x00000200;
 constant CLONE_FILES	is export(:clone, :unshare)	= 0x00000400;
@@ -69,3 +74,41 @@ constant MS_NOSEC	is export(:mount)	= 0x10000000;
 constant MS_BORN	is export(:mount)	= 0x20000000;
 constant MS_ACTIVE	is export(:mount)	= 0x40000000;
 constant MS_NOUSER	is export(:mount)	= 0x80000000;
+
+constant UNAME26		is export(:personality)	= 0x0020000;
+constant ADDR_NO_RANDOMIZE 	is export(:personality)	= 0x0040000;
+constant FDPIC_FUNCPTRS		is export(:personality) = 0x0080000;
+constant MMAP_PAGE_ZERO		is export(:personality) = 0x0100000;
+constant ADDR_COMPAT_LAYOUT	is export(:personality) = 0x0200000;
+constant READ_IMPLIES_EXEC	is export(:personality) = 0x0400000;
+constant ADDR_LIMIT_32BIT	is export(:personality) = 0x0800000;
+constant SHORT_INODE		is export(:personality) = 0x1000000;
+constant WHOLE_SECONDS		is export(:personality) = 0x2000000;
+constant STICKY_TIMEOUTS	is export(:personality)	= 0x4000000;
+constant ADDR_LIMIT_3GB		is export(:personality) = 0x8000000;
+
+constant PER_LINUX		is export(:personality) = 0x0000;
+constant PER_LINUX_32BIT	is export(:personality) = 0x0000 +| ADDR_LIMIT_32BIT;
+constant PER_LINUX_FDPIC	is export(:personality) = 0x0000 +| FDPIC_FUNCPTRS;
+constant PER_SVR4		is export(:personality) = 0x0001 +| STICKY_TIMEOUTS +| MMAP_PAGE_ZERO;
+constant PER_SVR3		is export(:personality) = 0x0002 +| STICKY_TIMEOUTS +| SHORT_INODE;
+constant PER_SCOSVR3		is export(:personality) = 0x0003 +| STICKY_TIMEOUTS +| WHOLE_SECONDS +| SHORT_INODE;
+constant PER_OSR5		is export(:personality) = 0x0003 +| STICKY_TIMEOUTS +| WHOLE_SECONDS;
+constant PER_WYSEV386		is export(:personality) = 0x0004 +| STICKY_TIMEOUTS +| SHORT_INODE;
+constant PER_ISCR4		is export(:personality) = 0x0005 +| STICKY_TIMEOUTS;
+constant PER_BSD		is export(:personality) = 0x0006;
+constant PER_SUNOS		is export(:personality) = 0x0006 +| STICKY_TIMEOUTS;
+constant PER_XENIX		is export(:personality) = 0x0007 +| STICKY_TIMEOUTS +| SHORT_INODE;
+constant PER_LINUX32		is export(:personality) = 0x0008;
+constant PER_LINUX32_3GB	is export(:personality) = 0x0008 +| ADDR_LIMIT_3GB;
+constant PER_IRIX32		is export(:personality) = 0x0009 +| STICKY_TIMEOUTS;
+constant PER_IRIXN32		is export(:personality) = 0x000a +| STICKY_TIMEOUTS;
+constant PER_IRIX64		is export(:personality) = 0x000b +| STICKY_TIMEOUTS;
+constant PER_RISCOS		is export(:personality) = 0x000c;
+constant PER_SOLARIS		is export(:personality) = 0x000d +| STICKY_TIMEOUTS;
+constant PER_UW7		is export(:personality) = 0x000e +| STICKY_TIMEOUTS +| MMAP_PAGE_ZERO;
+constant PER_OSF4		is export(:personality) = 0x000f;
+constant PER_HPUX		is export(:personality) = 0x0010;
+constant PER_MASK		is export(:personality) = 0x00ff;
+
+constant PER_CLEAR_ON_SETID	is export(:personality) = READ_IMPLIES_EXEC +| ADDR_NO_RANDOMIZE +| ADDR_COMPAT_LAYOUT +| MMAP_PAGE_ZERO;
