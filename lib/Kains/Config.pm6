@@ -31,7 +31,6 @@ class Kains::Config {
 	}
 
 	multi method set-cwd(Str $path) {
-		check-directory($path);
 		$!cwd = $path;
 	}
 }

@@ -38,7 +38,12 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 
 	chroot($config.rootfs);
 
-	chdir($config.cwd);
+	try chdir($config.cwd);
+	if $! ~~ X::IO::Chdir {
+		note $!.message ~ ' (in the new rootfs).';
+		note 'Changing the current working directory to "/".';
+		chdir('/');
+	}
 
 	personality(PER_LINUX32) if $config.mode32;
 
