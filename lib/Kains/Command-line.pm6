@@ -129,8 +129,7 @@ our sub parse(@arguments --> Kains::Config) {
 	));
 
 	given $cli.parse(@arguments) {
-		when Inf { }
-		default  { $config.command = @*ARGS[$_ ... *] }
+		when $_ < +@arguments { $config.command = @*ARGS[$_ ... *] }
 	}
 
 	return $config;
