@@ -22,25 +22,6 @@ use Command-line;
 =item $HOME
 =end R-bindings
 
-=begin R-bindings
-=item /etc/host.conf
-=item /etc/hosts
-=item /etc/hosts.equiv
-=item /etc/mtab
-=item /etc/netgroup
-=item /etc/networks
-=item /etc/passwd
-=item /etc/group
-=item /etc/nsswitch.conf
-=item /etc/resolv.conf
-=item /etc/localtime
-=item /dev/
-=item /sys/
-=item /proc/
-=item /tmp/
-=item $HOME
-=end R-bindings
-
 =begin S-bindings
 =item /etc/host.conf
 =item /etc/hosts
@@ -62,7 +43,7 @@ sub add-named-bindings(Kains::Config $config, Str $name) {
 
 		my Str $path = ~$_.contents[0].contents;
 
-		if $path ~~ m/\$(.*)/ {
+		if $path ~~ m/^\$(.*)/ {
 			$path = %*ENV{$0};
 		}
 
