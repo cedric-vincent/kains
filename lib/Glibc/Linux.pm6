@@ -8,12 +8,22 @@ sub unshare(int $flags) is export(:unshare) {
 	raise-errno-on(* < 0, &unshare, $flags);
 }
 
-sub mount(Str $source, Str $target, Str $type, int $flags, Str $data) is export(:mount) {
+sub mount(Str() $source, Str() $target, Str $type, int $flags, Str $data) is export(:mount) {
 	sub mount(Str, Str, Str, int, Str --> int) is native { * }
 	raise-errno-on(* < 0, &mount, $source, $target, $type, $flags, $data);
 }
 
-sub chroot(Str $path) is export(:chroot) {
+sub umount(Str() $path) is export(:mount) {
+	sub umount(Str --> int) is native { * }
+	raise-errno-on(* < 0, &umount, $path);
+}
+
+sub umount2(Str() $path, int $flags) is export(:mount) {
+	sub umount2(Str, int --> int) is native { * }
+	raise-errno-on(* < 0, &umount2, $path, $flags);
+}
+
+sub chroot(Str() $path) is export(:chroot) {
 	sub chroot(Str --> int) is native { * }
 	raise-errno-on(* < 0, &chroot, $path);
 }
@@ -74,6 +84,11 @@ constant MS_NOSEC	is export(:mount)	= 0x10000000;
 constant MS_BORN	is export(:mount)	= 0x20000000;
 constant MS_ACTIVE	is export(:mount)	= 0x40000000;
 constant MS_NOUSER	is export(:mount)	= 0x80000000;
+
+constant MNT_FORCE	is export(:mount)	= 1;
+constant MNT_DETACH	is export(:mount)	= 2;
+constant MNT_EXPIRE	is export(:mount)	= 4;
+constant UMOUNT_NOFOLLOW is export(:mount)	= 8;
 
 constant UNAME26		is export(:personality)	= 0x0020000;
 constant ADDR_NO_RANDOMIZE 	is export(:personality)	= 0x0040000;

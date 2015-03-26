@@ -24,7 +24,9 @@ class Kains::Config {
 		# have to be resolved respectively to the guest
 		# rootfs.
 
-		@.bindings.push: $host-path => $guest-path;
+		# $host-path have to be resolved before changing the
+		# root directory.
 
+		@.bindings.push: $host-path.IO.resolve => $guest-path;
 	}
 }
