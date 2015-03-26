@@ -24,13 +24,18 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 class X::Kains is Exception { has $.message };
 
 sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
-	my $old-uid = getuid;
-	my $old-gid = getgid;
+	my ($new-uid, $old-uid) = getuid() xx 2;
+	my ($new-gid, $old-gid) = getgid() xx 2;
+
+	if $config.root-id {
+		$new-uid = 0;
+		$new-gid = 0;
+	}
 
 	unshare(CLONE_NEWUSER +| CLONE_NEWNS);
 
-	set-uid-mapping(:$old-uid, :new-uid($config.root-id ?? 0 !! $old-uid));
-	set-gid-mapping(:$old-gid, :new-gid($config.root-id ?? 0 !! $old-gid));
+	set-uid-mapping(:$old-uid, :$new-uid);
+	set-gid-mapping(:$old-gid, :$new-gid);
 
 	for $config.bindings {
 		mount(.key, $config.rootfs ~ "/" ~ .value, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');

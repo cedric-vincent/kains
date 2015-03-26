@@ -76,7 +76,7 @@ our sub parse(@arguments --> Kains::Config) {
 		),
 		Command-line::Option.new(
 			switches	=> < -w --pwd --cwd --working-directory >,
-			callback	=> sub { $config.set-cwd($^a) },
+			callback	=> sub { $config.cwd = $^a },
 			examples	=> ( '/tmp',
 					     $config.cwd ~ '  (first default)',
 					     '/  (second default)' )
