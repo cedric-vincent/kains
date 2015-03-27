@@ -2,9 +2,7 @@ module Kains;
 
 use Kains::Config;
 use Kains::Command-line;
-
-use Glibc::Linux :unshare, :mount, :chroot, :personality;
-use Glibc :getuid, :getgid, :getpid;
+use Kains::Linux::Syscall;
 
 sub set-uid-mapping(int :$old-uid, int :$new-uid) {
 	spurt('/proc/self/uid_map', "$new-uid $old-uid 1");
@@ -21,6 +19,17 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 	CATCH {	default { note "Warning: can't map group identity: { .message }" } }
 }
 
+sub mount-host-rootfs(Kains::Config $config --> Str) {
+	return '/' but False if $config.rootfs === '/';
+
+	my Str $host-rootfs = '/.kains-' ~ getpid;
+
+	mkdir($config.rootfs ~ $host-rootfs);
+	mount('/', $config.rootfs ~ $host-rootfs, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
+
+	return $host-rootfs;
+}
+
 class X::Kains is Exception {
 	has Str $.message;
 	has Bool $.works-with-proot = False;
@@ -33,17 +42,6 @@ class X::Kains is Exception {
 		return $message;
 	}
 };
-
-sub mount-host-rootfs(Kains::Config $config --> Str) {
-	return '/' but False if $config.rootfs === '/';
-
-	my Str $host-rootfs = '/.kains-' ~ getpid;
-
-	mkdir($config.rootfs ~ $host-rootfs);
-	mount('/', $config.rootfs ~ $host-rootfs, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
-
-	return $host-rootfs;
-}
 
 sub mount-bindings(Str $host-rootfs, Kains::Config $config) {
 	for $config.bindings {
@@ -116,8 +114,6 @@ sub launch-command-in-new-namespace(Kains::Config $config --> Proc::Status) {
 	}
 
 	CATCH {
-		use Glibc::Errno;
-
 		when X::Errno {
 			my Str $message = "Error: { .message }\n";
 
