@@ -1,8 +1,7 @@
 #!/usr/bin/env perl6
 
 use v6;
-use lib 'lib';
-use Kains;
+need Kains;
 
 exit Kains::start;
 
