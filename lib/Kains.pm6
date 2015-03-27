@@ -12,7 +12,7 @@ our sub start(--> Int) {
 		when X::Command-line {
 			die X::Kains.new(message => qq:to/END/
 				{ .message }
-				Please have a look at the --help option
+				Please have a look at the --help option.
 				END
 			);
 		}

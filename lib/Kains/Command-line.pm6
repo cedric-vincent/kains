@@ -12,7 +12,7 @@ class X::Command-line is Exception {
 	has $.option;
 
 	method message {
-		my Str $message = "Error while processing $!argument option: $!message";
+		my Str $message = "Error while processing \"$!argument\" option: $!message";
 
 		if $!option.defined {
 			for $!option.examples {
@@ -39,7 +39,7 @@ class Command-line::Interface {
 				return $index;
 			}
 
-			my @parameters = ();
+			my @parameters;
 			if $option.callback.count > 0 {
 				my $old-index = $index;
 				$index += $option.callback.count;
@@ -64,6 +64,24 @@ class Command-line::Interface {
 	}
 
 	method print-help {
-		...
+		say q:to/END/;
+		    Command-line interface
+		    ----------------------
+		    END
+
+		for @.options {
+			for .switches -> $switch {
+				say "$switch " ~ .callback.signature.params».name;
+			}
+
+			say "    $_" for .description.lines;
+
+			for .examples -> $example {
+				FIRST { say "\n    Some examples:" }
+				say "        " ~ .switches[0] ~ " $example";
+			}
+
+			print "\n";
+		}
 	}
 }
