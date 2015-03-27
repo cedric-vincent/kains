@@ -1,0 +1,9 @@
+{
+    "name" : "Kains",
+    "version" : "v0.0.1",
+    "description" : "Container tool based on chroot, mount --bind, and Linux namespaces",
+    "authors" : [ "Cédric Vincent" ],
+    "license" : "https://www.gnu.org/licenses/gpl-2.0.html",
+    "tags" : [ "linux", "chroot", "mount", "bind" ],
+    "perl" : "v6.0.0"
+}
