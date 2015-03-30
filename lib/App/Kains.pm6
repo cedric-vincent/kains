@@ -3,8 +3,8 @@ module App::Kains;
 use App::Kains::Parameters;
 use App::Kains::Core;
 
-our sub start(--> Int) {
-	my $config = parse-arguments(@*ARGS);
+our sub start(*@arguments --> Int) {
+	my $config = parse-arguments(@arguments);
 
 	return launch($config).exit;
 
