@@ -174,7 +174,7 @@ END
 	));
 
 	given $cli.parse(@arguments) {
-		when $_ < +@arguments { $config.command = @*ARGS[$_ ... *] }
+		when $_ < +@arguments { $config.command = @arguments[$_ ... *] }
 	}
 
 	return $config;
