@@ -51,7 +51,7 @@ rootfs can be made visible within the guest rootfs by using "-b" and
 "-B" to relocate files within the host rootfs, or when using "-0" to
 fake root privileges.
 
-It is recommended to use the "-R" or "-S" parameters instead.
+It is recommended to use "-R" or "-S" instead.
 END
 		),
 		Param.new(
@@ -67,7 +67,7 @@ accessible as $path within the guest rootfs too.
 END
 		),
 		Param.new(
-			switches	=> < -B --bind-elsewhere --mount-elsewhere >,
+			switches	=> < -B -M --bind-elsewhere --mount-elsewhere >,
 			callback	=> sub ($path, $location) { $config.add-binding($path, $location) },
 			examples	=> ( %*ENV<HOME> ~ '/my_hosts /etc/hosts',
 					     '/tmp/opt /opt',
@@ -91,7 +91,7 @@ END
 Set the initial working directory to $path.
 
 Some programs expect to be launched from a specific directory but they
-do not move to it by themselves.  This parameter avoids the need for
+do not move to it by themselves.  This option avoids the need for
 running a shell only to change the current working directory.
 END
 		),
@@ -103,7 +103,7 @@ Set user and group identities virtually to "root/root".
 
 Some programs will refuse to work if they are not run with "root"
 privileges, even if there is no strong reasons for that.  This is
-typically the case with package managers.  This parameter changes the
+typically the case with package managers.  This option changes the
 user and group identities to "root/root" in order to bypass this kind
 of limitation, however all operations are still performed with the
 original user and group identities.
@@ -116,7 +116,7 @@ END
 Make Linux declare itself and behave as a 32-bit kernel.
 
 Some programs launched within a 32-bit guest rootfs might get confused
-if they detect they are run by a 64-bit kernel.  This parameter makes
+if they detect they are run by a 64-bit kernel.  This option makes
 Linux declare itself and behave as a 32-bit kernel.
 END
 		),
@@ -142,11 +142,11 @@ END
 			description	=> q:c:to/END/,
 Use $path as guest rootfs and make some host files still visible + fake "root" privileges.
 
-This parameter is similar to "-0 -R" but it makes visible within the
+This option is similar to "-0 -R" but it makes visible within the
 guest rootfs a smaller set of host files and directories (to avoid
 unexpected changes): { do for @S-bindings { "\n    - $_" } }
 
-This parameter is useful to create and install packages into the guest
+This option is useful to create and install packages into the guest
 rootfs.
 END
 		),
@@ -166,9 +166,9 @@ END
 			description	=> q:to/END/,
 Launch @command in the virtualized environment.
 
-This parameter is only syntactic sugar since it is possible to specify
+This option is only syntactic sugar since it is possible to specify
 the @command at the very end of the command-line, ie. after all other
-parameters.
+options.
 END
 		),
 	));

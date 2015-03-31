@@ -108,7 +108,7 @@ our sub launch(Config $config --> Proc::Status) is export {
 	personality(PER_LINUX32) if $config.mode32;
 
 	given run(|$config.command) {
-		when -1 { die X::Kains.new(message => "{ $config.command[0] } can't be found or can't be executed.") }
+		when -1 { die X::Kains.new(message => "Error: { $config.command[0] } can't be found or can't be executed.") }
 		default { return $_ }
 	}
 
