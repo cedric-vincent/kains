@@ -1,7 +1,7 @@
-module Kains::Core;
+module App::Kains::Core;
 
-use Kains::Linux::Syscall;
-need Kains::Config;
+use App::Kains::Native;
+use App::Kains::Config;
 
 sub set-uid-mapping(int :$old-uid, int :$new-uid) {
 	spurt('/proc/self/uid_map', "$new-uid $old-uid 1");
@@ -18,7 +18,7 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 	CATCH {	default { note "Warning: can't map group identity: { .message }" } }
 }
 
-sub mount-host-rootfs(Kains::Config $config --> Str) {
+sub mount-host-rootfs(Config $config --> Str) {
 	return '/' but False if $config.rootfs === '/';
 
 	my Str $host-rootfs = '/.kains-' ~ getpid;
@@ -42,7 +42,7 @@ class X::Kains is Exception is export {
 	}
 };
 
-sub mount-bindings(Str $host-rootfs, Kains::Config $config) {
+sub mount-bindings(Str $host-rootfs, Config $config) {
 	for $config.bindings {
 		my IO::Path $source	 .= new($host-rootfs ~ .key);
 		my IO::Path $destination .= new(.value);
@@ -73,7 +73,7 @@ sub mount-bindings(Str $host-rootfs, Kains::Config $config) {
 	}
 }
 
-our sub launch(Kains::Config $config --> Proc::Status) {
+our sub launch(Config $config --> Proc::Status) is export {
 	my ($new-uid, $old-uid) = getuid() xx 2;
 	my ($new-gid, $old-gid) = getgid() xx 2;
 

@@ -1,0 +1,22 @@
+{
+  "perl" : "v6",
+  "name" : "Kains",
+  "description" : "Container tool based on chroot, mount --bind, and Linux namespaces",
+  "version" : "v0.0.1",
+  "build-depends" : [
+    "NativeCall"
+  ],
+  "test-depends" : [ ],
+  "depends" : [ ],
+  "provides" : {
+    "App::Kains::Config" : "lib/App/Kains/Core.pm6",
+    "App::Kains::Command-line" : "lib/App/Kains/Parameters.pm6",
+    "App::Kains::Native" : "lib/App/Kains/Core.pm6",
+    "App::Kains::Parameters" : "lib/App/Kains/Parameters.pm6",
+    "App::Kains::Core" : "lib/App/Kains/Core.pm6",
+    "App::Kains" : "lib/App/Kains.pm6"
+  },
+  "support" : {
+    "source" : ""
+  }
+}

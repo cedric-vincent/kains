@@ -1,7 +1,7 @@
-module Kains::Config::Command-line;
+module App::Kains::Parameters;
 
-need Kains::Config;
-need Kains::Command-line;
+use App::Kains::Config;
+use App::Kains::Commandline;
 
 my @R-bindings = <
 	/etc/host.conf
@@ -31,11 +31,11 @@ my @S-bindings = <
 	/tmp/ >,
 	%*ENV<HOME>;
 
-our sub parse(@arguments --> Kains::Config) {
-	my Kains::Config $config .= new;
+our sub parse-arguments(@arguments --> Config) is export {
+	my Config $config .= new;
 
-	my Command-line::Interface $cli .= new(options => (
-		Command-line::Option.new(
+	my Interface $cli .= new(parameters => (
+		Param.new(
 			switches	=> < -r --rootfs >,
 			callback	=> sub { $config.set-rootfs($^path) },
 			examples	=> ( %*ENV<HOME> ~ '/rootfs/centos-6-x86',
@@ -46,15 +46,15 @@ Use $path as the new root file-system, aka. guest rootfs.
 
 Programs will be executed from, and confined into the guest rootfs
 specified by $path.  Although, files and directories from the host
-rootfs can be made visible within the guest rootfs by using the "-b"
-and "-B" options.  By default the guest rootfs is "/", this makes
-sense when using the "-B" option to relocate files within the host
-rootfs, or when using the "-0" option to fake root privileges.
+rootfs can be made visible within the guest rootfs by using "-b" and
+"-B".  By default the guest rootfs is "/", this makes sense when using
+"-B" to relocate files within the host rootfs, or when using "-0" to
+fake root privileges.
 
-It is recommended to use the "-R" or "-S" options instead.
+It is recommended to use the "-R" or "-S" parameters instead.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -b -m --bind --mount >,
 			callback	=> sub { $config.add-binding($^path) },
 			examples	=> ( '/proc', '/dev' , %*ENV<HOME>),
@@ -62,11 +62,11 @@ END
 Make $path visible in the guest rootfs, at the same location.
 
 The content of $path will be made visible within the guest rootfs.
-Unlike with the "-B" option, the location isn't changed, that is, it
-will be accessible as $path within the guest rootfs too.
+Unlike with "-B", the location isn't changed, that is, it will be
+accessible as $path within the guest rootfs too.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -B --bind-elsewhere --mount-elsewhere >,
 			callback	=> sub ($path, $location) { $config.add-binding($path, $location) },
 			examples	=> ( %*ENV<HOME> ~ '/my_hosts /etc/hosts',
@@ -81,7 +81,7 @@ the guest rootfs to make the content of $path accessible somewhere
 else in the file-system hierarchy.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -w --pwd --cwd --working-directory >,
 			callback	=> sub { $config.cwd = $^path },
 			examples	=> ( '/tmp',
@@ -91,11 +91,11 @@ END
 Set the initial working directory to $path.
 
 Some programs expect to be launched from a specific directory but they
-do not move to it by themselves.  This option avoids the need for
+do not move to it by themselves.  This parameter avoids the need for
 running a shell only to change the current working directory.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -0 --root-id >,
 			callback	=> sub { $config.root-id = True },
 			description	=> q:to/END/,
@@ -103,24 +103,24 @@ Set user and group identities virtually to "root/root".
 
 Some programs will refuse to work if they are not run with "root"
 privileges, even if there is no strong reasons for that.  This is
-typically the case with package managers.  This option changes the
+typically the case with package managers.  This parameter changes the
 user and group identities to "root/root" in order to bypass this kind
 of limitation, however all operations are still performed with the
 original user and group identities.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < --32 --32bit --32bit-mode >,
 			callback	=> sub { $config.mode32 = True },
 			description	=> q:to/END/,
 Make Linux declare itself and behave as a 32-bit kernel.
 
 Some programs launched within a 32-bit guest rootfs might get confused
-if they detect they are run by a 64-bit kernel.  This option makes
+if they detect they are run by a 64-bit kernel.  This parameter makes
 Linux declare itself and behave as a 32-bit kernel.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -R >,
 			callback	=> sub { $config.set-rootfs($^path);
 						 $config.add-bindings(@R-bindings) },
@@ -134,7 +134,7 @@ files and directories typically contains information that are likely
 required by guest programs: { do for @R-bindings { "\n    - $_" } }
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -S >,
 			callback	=> sub { $config.set-rootfs($^path);
 						 $config.add-bindings(@S-bindings);
@@ -142,22 +142,22 @@ END
 			description	=> q:c:to/END/,
 Use $path as guest rootfs and make some host files still visible + fake "root" privileges.
 
-This option is similar to "-0 -R" but it makes visible within the
+This parameter is similar to "-0 -R" but it makes visible within the
 guest rootfs a smaller set of host files and directories (to avoid
 unexpected changes): { do for @S-bindings { "\n    - $_" } }
 
-This option is useful to create and install packages into the guest
+This parameter is useful to create and install packages into the guest
 rootfs.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -h --help --usage >,
 			callback	=> sub { $cli.print-help; exit 1 },
 			description	=> q:to/END/,
 Print the help message, then exit.
 END
 		),
-		Command-line::Option.new(
+		Param.new(
 			switches	=> < -- >,
 			callback	=> sub (*@command) { $config.command = @command },
 			examples	=> ( 'emacs',
@@ -166,9 +166,9 @@ END
 			description	=> q:to/END/,
 Launch @command in the virtualized environment.
 
-This option is only syntactic sugar since it is possible to specify
+This parameter is only syntactic sugar since it is possible to specify
 the @command at the very end of the command-line, ie. after all other
-options.
+parameters.
 END
 		),
 	));

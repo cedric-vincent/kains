@@ -1,12 +1,12 @@
-module Kains;
+module App::Kains;
 
-need Kains::Config::Command-line;
-need Kains::Core;
+use App::Kains::Parameters;
+use App::Kains::Core;
 
 our sub start(--> Int) {
-	my $config = Kains::Config::Command-line::parse(@*ARGS);
+	my $config = parse-arguments(@*ARGS);
 
-	return Kains::Core::launch($config).exit;
+	return launch($config).exit;
 
 	CATCH {
 		when X::Command-line {

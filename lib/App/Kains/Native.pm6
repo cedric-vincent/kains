@@ -1,4 +1,4 @@
-module Kains::Linux::Syscall;
+module App::Kains::Native;
 
 use NativeCall;
 

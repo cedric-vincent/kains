@@ -1,4 +1,6 @@
-class Kains::Config {
+module App::Kains::Config;
+
+class Config is export {
 	has Str $.rootfs	= '/';
 	has Enum @.bindings	= ();
 	has Str $.cwd is rw	= ~$*CWD;
