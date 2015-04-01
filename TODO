@@ -1,0 +1,25 @@
+- Improve startup time.
+
+- Cleanup placeholders.
+
+- Add support to download rootfs.
+
+- Fix:
+
+    $ kains -B / /tmp/whatever kains -r /tmp/whatever
+    Error: mount("/", "/tmp/whatever/.kains-20551", "", 0x45000, ""): No such file or directory
+
+- Add comparison with PRoot:
+
+  ======================================  ==============  ==============
+                                          kains                proot
+  ======================================  ==============  ==============
+  Linux                                   >= 3.8.0        >= 2.6.0
+  has an impact on performance            no              yes
+  needs root privileges                   no              no
+  grants root privileges                  partially       partially
+  preserves auxiliary groups              no              yes
+  support ptrace                          yes             emulation
+  can bind symlinks without XXX           no              yes
+  can bind to non existing path           no              yes
+  ======================================  ==============  ==============

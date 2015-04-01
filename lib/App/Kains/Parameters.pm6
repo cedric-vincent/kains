@@ -77,9 +77,9 @@ our sub new-config-from-arguments(@arguments --> Config) is export {
 			description	=> q:to/END/,
 Use $path as the new root file-system, aka. virtual rootfs.
 
-Programs will be executed from, and confined into the virtual rootfs
-specified by $path.  Although, files and directories from the actual
-rootfs can be made visible within the virtual rootfs by using "-b" and
+Programs will be executed from, and confined within the virtual rootfs
+specified by $path.  Although, files and directories of the actual
+rootfs can be made visible from the virtual rootfs by using "-b" and
 "-B".  By default the virtual rootfs is "/", this makes sense when
 using "-B" to relocate files within the actual rootfs, or when using
 "-0" to fake root privileges.
@@ -92,9 +92,9 @@ END
 			callback	=> sub { $config.add-binding($^path) },
 			examples	=> ( '/proc', '/dev' , %*ENV<HOME>),
 			description	=> q:to/END/,
-Make $path visible in the virtual rootfs, at the same location.
+Make $path visible from the virtual rootfs, at the same location.
 
-The content of $path will be made visible within the virtual rootfs.
+The content of $path will be made visible from the virtual rootfs.
 Unlike with "-B", the location isn't changed, that is, it will be
 accessible as $path within the virtual rootfs too.
 END
@@ -106,12 +106,12 @@ END
 					     '/tmp/opt /opt',
 					     '/bin/bash /bin/sh' ),
 			description	=> q:to/END/,
-Make $path visible in the virtual rootfs, at the given $location.
+Make $path visible from the virtual rootfs, at the given $location.
 
-The content of $path will be made visible at the given $location
-within the virtual rootfs.  This is especially useful when using "/"
-as the virtual rootfs to make the content of $path accessible
-somewhere else in the file-system hierarchy.
+The content of $path will be made visible at the given $location from
+the virtual rootfs.  This is especially useful when using "/" as the
+virtual rootfs to make the content of $path accessible somewhere else
+in the file-system hierarchy.
 END
 		),
 		Param.new(
@@ -160,11 +160,11 @@ END
 			description	=> q:c:to/END/,
 Use $path as virtual rootfs + bind some files/directories.
 
-Programs will be executed from, and confined into the virtual rootfs
-specified by $path.  Although a set of files and directories from the
-actual rootfs will still be visible within the virtual rootfs.  These
-files and directories typically contains information that are likely
-required by virtual programs: { do for R-bindings() { "\n    - $_" } }
+Programs will be executed from, and confined within the virtual rootfs
+specified by $path.  Although a set of files and directories of the
+actual rootfs will still be visible from the virtual rootfs.  These
+files and directories contain information that are likely required by
+virtual programs:{ do for R-bindings() { "\n    - $_" } }
 END
 		),
 		Param.new(
@@ -175,8 +175,8 @@ END
 			description	=> q:c:to/END/,
 Use $path as virtual rootfs + bind some files/directories + fake "root".
 
-This option is similar to "-0 -R" but it makes visible within the
-virtual rootfs a smaller set of files and directories from the actual
+This option is similar to "-0 -R" but it makes visible from the
+virtual rootfs a smaller set of files and directories of the actual
 rootfs (to avoid unexpected changes): { do for S-bindings() { "\n    - $_" } }
 
 This option is useful to create and install packages into the virtual
@@ -197,7 +197,7 @@ END
 					     '/usr/bin/wget',
 					     $config.command ~ '  (default)' ),
 			description	=> q:to/END/,
-Launch @command in the virtualized environment.
+Launch @command in the virtual environment.
 
 This option is only syntactic sugar since it is possible to specify
 the @command at the very end of the command-line, ie. after all other
