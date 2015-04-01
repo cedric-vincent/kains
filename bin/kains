@@ -5,4 +5,4 @@ use App::Kains;
 
 exit App::Kains::start(@*ARGS);
 
-CATCH { when X::Kains { note .message } }
+CATCH { when X::Kains { note .message; exit 1 } }

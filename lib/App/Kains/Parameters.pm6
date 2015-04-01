@@ -50,7 +50,7 @@ my @S-bindings = <
 	/tmp/ >,
 	%*ENV<HOME>;
 
-our sub parse-arguments(@arguments --> Config) is export {
+our sub new-config-from-arguments(@arguments --> Config) is export {
 	my Config $config .= new;
 
 	my Interface $cli .= new(parameters => (
@@ -171,7 +171,7 @@ END
 		),
 		Param.new(
 			switches	=> < -h --help --usage >,
-			callback	=> sub { $cli.print-help; exit 1 },
+			callback	=> sub { $cli.print-long-help; exit 1 },
 			description	=> q:to/END/,
 Print the help message, then exit.
 END
@@ -191,6 +191,11 @@ options.
 END
 		),
 	));
+
+	if ! @arguments {
+		$cli.print-short-help;
+		exit 1;
+	}
 
 	given $cli.parse(@arguments) {
 		when $_ < +@arguments { $config.command = @arguments[$_ ... *] }

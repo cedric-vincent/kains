@@ -81,7 +81,7 @@ class Interface is export {
 		return $index;
 	}
 
-	method print-help {
+	method print-long-help {
 		say q:to/END/;
 		    Command-line interface
 		    ----------------------
@@ -100,6 +100,29 @@ class Interface is export {
 			}
 
 			print "\n";
+		}
+	}
+
+	method print-short-help {
+		say 'Usage: kains [options] ... [command]';
+		say '';
+
+		my @items;
+		for @.parameters {
+			@items.push: {	switch		=> .switches[0],
+					params		=> .callback.signature.params».name,
+					description	=> .description.lines[0] }
+		}
+
+		my $first-row-length = max(@items.map({ .<switch>.chars + .<params>.chars + 1}));
+
+		for @items {
+			my $first-row = .<switch> ~ do { ' ' ~ .<params> if .<params>.chars };
+
+			print $first-row;
+			print ' ' xx ($first-row-length - $first-row.chars);
+			print '  ';
+			say .<description>;
 		}
 	}
 }
