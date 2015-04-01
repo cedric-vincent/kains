@@ -61,14 +61,14 @@ our sub new-config-from-arguments(@arguments --> Config) is export {
 					     '/tmp/ubuntu-12.04-x86_64',
 					     $config.rootfs ~ '  (default)' ),
 			description	=> q:to/END/,
-Use $path as the new root file-system, aka. guest rootfs.
+Use $path as the new root file-system, aka. virtual rootfs.
 
-Programs will be executed from, and confined into the guest rootfs
-specified by $path.  Although, files and directories from the host
-rootfs can be made visible within the guest rootfs by using "-b" and
-"-B".  By default the guest rootfs is "/", this makes sense when using
-"-B" to relocate files within the host rootfs, or when using "-0" to
-fake root privileges.
+Programs will be executed from, and confined into the virtual rootfs
+specified by $path.  Although, files and directories from the actual
+rootfs can be made visible within the virtual rootfs by using "-b" and
+"-B".  By default the virtual rootfs is "/", this makes sense when
+using "-B" to relocate files within the actual rootfs, or when using
+"-0" to fake root privileges.
 
 It is recommended to use "-R" or "-S" instead.
 END
@@ -78,11 +78,11 @@ END
 			callback	=> sub { $config.add-binding($^path) },
 			examples	=> ( '/proc', '/dev' , %*ENV<HOME>),
 			description	=> q:to/END/,
-Make $path visible in the guest rootfs, at the same location.
+Make $path visible in the virtual rootfs, at the same location.
 
-The content of $path will be made visible within the guest rootfs.
+The content of $path will be made visible within the virtual rootfs.
 Unlike with "-B", the location isn't changed, that is, it will be
-accessible as $path within the guest rootfs too.
+accessible as $path within the virtual rootfs too.
 END
 		),
 		Param.new(
@@ -92,12 +92,12 @@ END
 					     '/tmp/opt /opt',
 					     '/bin/bash /bin/sh' ),
 			description	=> q:to/END/,
-Make $path visible in the guest rootfs, at the given $location.
+Make $path visible in the virtual rootfs, at the given $location.
 
 The content of $path will be made visible at the given $location
-within the guest rootfs.  This is especially useful when using "/" as
-the guest rootfs to make the content of $path accessible somewhere
-else in the file-system hierarchy.
+within the virtual rootfs.  This is especially useful when using "/"
+as the virtual rootfs to make the content of $path accessible
+somewhere else in the file-system hierarchy.
 END
 		),
 		Param.new(
@@ -134,9 +134,9 @@ END
 			description	=> q:to/END/,
 Make Linux declare itself and behave as a 32-bit kernel.
 
-Some programs launched within a 32-bit guest rootfs might get confused
-if they detect they are run by a 64-bit kernel.  This option makes
-Linux declare itself and behave as a 32-bit kernel.
+Some programs launched within a 32-bit virtual rootfs might get
+confused if they detect they are run by a 64-bit kernel.  This option
+makes Linux declare itself and behave as a 32-bit kernel.
 END
 		),
 		Param.new(
@@ -144,13 +144,13 @@ END
 			callback	=> sub { $config.set-rootfs($^path);
 						 $config.add-bindings(@R-bindings) },
 			description	=> q:c:to/END/,
-Use $path as guest rootfs and make some host files still visible.
+Use $path as virtual rootfs + bind some files/directories.
 
-Programs will be executed from, and confined into the guest rootfs
+Programs will be executed from, and confined into the virtual rootfs
 specified by $path.  Although a set of files and directories from the
-host rootfs will still be visible within the guest rootfs.  These
+actual rootfs will still be visible within the virtual rootfs.  These
 files and directories typically contains information that are likely
-required by guest programs: { do for @R-bindings { "\n    - $_" } }
+required by virtual programs: { do for @R-bindings { "\n    - $_" } }
 END
 		),
 		Param.new(
@@ -159,13 +159,13 @@ END
 						 $config.add-bindings(@S-bindings);
 						 $config.root-id = True },
 			description	=> q:c:to/END/,
-Use $path as guest rootfs and make some host files still visible + fake "root" privileges.
+Use $path as virtual rootfs + bind some files/directories + fake "root".
 
 This option is similar to "-0 -R" but it makes visible within the
-guest rootfs a smaller set of host files and directories (to avoid
-unexpected changes): { do for @S-bindings { "\n    - $_" } }
+virtual rootfs a smaller set of files and directories from the actual
+rootfs (to avoid unexpected changes): { do for @S-bindings { "\n    - $_" } }
 
-This option is useful to create and install packages into the guest
+This option is useful to create and install packages into the virtual
 rootfs.
 END
 		),

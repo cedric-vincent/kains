@@ -37,15 +37,15 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 	CATCH {	default { note "Warning: can't map group identity: { .message }" } }
 }
 
-sub mount-host-rootfs(Config $config --> Str) {
+sub mount-actual-rootfs(Config $config --> Str) {
 	return '/' but False if $config.rootfs === '/';
 
-	my Str $host-rootfs = '/.kains-' ~ getpid;
+	my Str $actual-rootfs = '/.kains-' ~ getpid;
 
-	mkdir($config.rootfs ~ $host-rootfs);
-	mount('/', $config.rootfs ~ $host-rootfs, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
+	mkdir($config.rootfs ~ $actual-rootfs);
+	mount('/', $config.rootfs ~ $actual-rootfs, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
 
-	return $host-rootfs;
+	return $actual-rootfs;
 }
 
 class X::Kains is Exception is export {
@@ -61,9 +61,9 @@ class X::Kains is Exception is export {
 	}
 };
 
-sub mount-bindings(Str $host-rootfs, Config $config) {
+sub mount-bindings(Str $actual-rootfs, Config $config) {
 	for $config.bindings {
-		my IO::Path $source	 .= new($host-rootfs ~ .key);
+		my IO::Path $source	 .= new($actual-rootfs ~ .key);
 		my IO::Path $destination .= new(.value);
 
 		if ! $destination.IO.e {
@@ -81,8 +81,8 @@ sub mount-bindings(Str $host-rootfs, Config $config) {
 			if $destination.f && ! $source.f
 			|| $destination.d && ! $source.d {
 				die X::Kains.new(:works-with-proot, message => qq:to/END/
-					Can't bind "$destination", its type in the guest rootfs doesn't match
-					its type in the host rootfs.
+					Can't bind "$destination", its type in the virtual rootfs doesn't match
+					its type in the actual rootfs.
 					END
 				);
 			}
@@ -106,15 +106,15 @@ our sub launch(Config $config --> Proc::Status) is export {
 	set-uid-mapping(:$old-uid, :$new-uid);
 	set-gid-mapping(:$old-gid, :$new-gid);
 
-	my $host-rootfs = mount-host-rootfs($config);
+	my $actual-rootfs = mount-actual-rootfs($config);
 
 	chroot($config.rootfs);
 
-	mount-bindings($host-rootfs, $config);
+	mount-bindings($actual-rootfs, $config);
 
-	if $host-rootfs {
-		try umount2($host-rootfs, MNT_DETACH);
-		try rmdir($host-rootfs);
+	if $actual-rootfs {
+		try umount2($actual-rootfs, MNT_DETACH);
+		try rmdir($actual-rootfs);
 	}
 
 	try chdir($config.cwd);

@@ -43,7 +43,7 @@ class Config is export {
 
 		# $destination path can't be checked now because
 		# symlinks have to be resolved respectively to the
-		# guest rootfs.
+		# virtual rootfs.
 
 		# $source path have to be resolved before changing the
 		# root directory.
