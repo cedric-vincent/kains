@@ -55,38 +55,50 @@ class X::Kains is Exception is export {
 	method message {
 		my $message = "$!message";
 		if $!works-with-proot {
-			$message ~= "Although, this should work with PRoot (http://proot.me)."
+			$message ~= "\nAlthough, this should work with PRoot (http://proot.me)."
 		}
 		return $message;
 	}
 };
+
+multi sub create-placeholder(IO::Path $source, IO::Path $destination
+	where {    $destination.f and $source.f
+		or $destination.d and $source.d }) {
+	return;
+}
+
+multi sub create-placeholder(IO::Path $source, IO::Path $destination
+	where {    $destination.f and ! $source.f
+		or $destination.d and ! $source.d }) {
+	die X::Kains.new(:works-with-proot, message =>
+qq[[Error: can't mount/bind "$destination", its type in the virtual rootfs
+doesn't match its type in the actual rootfs.]]);
+}
+
+multi sub create-placeholder(IO::Path $source, IO::Path $destination)
+{
+	multi sub paths(IO() $path where * cmp '/' === Same) { return $path }
+	multi sub paths(IO() $path) { return paths($path.parent), $path }
+
+	.mkdir if ! .e for paths($destination.parent);
+
+	given $source {
+		when .f { open(~$destination, :a).close }
+		when .d { mkdir(~$destination) }
+		default { die X::NYI.new(feature => 'mounting/binding special file') }
+	}
+
+	CATCH {
+		die X::Kains.new(:works-with-proot, message => .message);
+	}
+}
 
 sub mount-bindings(Str $actual-rootfs, Config $config) {
 	for $config.bindings {
 		my IO::Path $source	 .= new($actual-rootfs ~ .key);
 		my IO::Path $destination .= new(.value);
 
-		if ! $destination.IO.e {
-			given $source {
-				when .f { open(~$destination, :a).close }
-				when .d { mkdir(~$destination) }
-				default { !!! }
-			}
-
-			CATCH {
-				die X::Kains.new(:works-with-proot, message => .message);
-			}
-		}
-		else {
-			if $destination.f && ! $source.f
-			|| $destination.d && ! $source.d {
-				die X::Kains.new(:works-with-proot, message => qq:to/END/
-					Can't bind "$destination", its type in the virtual rootfs doesn't match
-					its type in the actual rootfs.
-					END
-				);
-			}
-		}
+		create-placeholder($source, $destination);
 
 		mount($source, $destination, '', MS_PRIVATE +| MS_BIND +| MS_REC, '');
 	}
@@ -127,17 +139,18 @@ our sub launch(Config $config --> Proc::Status) is export {
 	personality(PER_LINUX32) if $config.mode32;
 
 	given run(|$config.command) {
-		when -1 { die X::Kains.new(message => "Error: { $config.command[0] } can't be found or can't be executed.") }
+		when -1 { die X::Kains.new(message =>
+			"Error: { $config.command[0] } can't be found or can't be executed.") }
 		default { return $_ }
 	}
 
 	CATCH {
 		when X::Errno {
-			my Str $message = "Error: { .message }\n";
+			my Str $message = "Error: { .message }";
 
 			if .errno == EPERM
 			or .errno == EINVAL and .function.name eq 'unshare' {
-				$message ~= "It seems your system doesn't support user namespaces."
+				$message ~= "\tIt seems your system doesn't support user namespaces."
 			}
 
 			die X::Kains.new(:$message, :works-with-proot);

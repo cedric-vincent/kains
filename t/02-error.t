@@ -20,11 +20,12 @@
 use v6;
 use Test;
 
-plan 6;
+plan 7;
 
 {
 	use App::Kains;
-	throws_like { App::Kains::start('/this/does/not/exist') }, X::Kains, 'top level error';
+	throws_like { App::Kains::start('/this/does/not/exist') }, X::Kains, 'not such file';
+	throws_like { App::Kains::start(< -B /etc /etc/fstab >) }, X::Kains, 'incompatible file type';
 }
 
 {

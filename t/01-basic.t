@@ -20,7 +20,7 @@
 use v6;
 use Test;
 
-plan 27;
+plan 28;
 
 use App::Kains;
 
@@ -60,3 +60,7 @@ for < --32 --32bit --32bit-mode > {
 is App::Kains::start(< -R / true >), 0, "use -R option";
 
 is App::Kains::start(« -S / sh -c 'id -g | grep -qx 0' »), 0, "use -S option";
+
+my $nonexistent-path = '/tmp/kains-' ~ (('a'..'z', 'A'..'Z', 0..9).pick xx 30).join;
+is App::Kains::start(« -B /dev $nonexistent-path test -d $nonexistent-path »), 0,
+	'mount/bind to nonexistent location';
