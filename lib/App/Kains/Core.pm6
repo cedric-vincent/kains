@@ -150,7 +150,7 @@ our sub launch(Config $config --> Proc::Status) is export {
 
 			if .errno == EPERM
 			or .errno == EINVAL and .function.name eq 'unshare' {
-				$message ~= "\tIt seems your system doesn't support user namespaces."
+				$message ~= "\nIt seems your system doesn't support user namespaces."
 			}
 
 			die X::Kains.new(:$message, :works-with-proot);

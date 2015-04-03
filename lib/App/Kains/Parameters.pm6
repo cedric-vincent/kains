@@ -22,33 +22,47 @@ module App::Kains::Parameters;
 use App::Kains::Config;
 use App::Kains::Commandline;
 
-my @R-bindings = <
-	/etc/host.conf
-	/etc/hosts
-	/etc/hosts.equiv
-	/etc/mtab
-	/etc/netgroup
-	/etc/networks
-	/etc/passwd
-	/etc/group
-	/etc/nsswitch.conf
-	/etc/resolv.conf
-	/etc/localtime
-	/dev/
-	/sys/
-	/proc/
-	/tmp/ >,
-	%*ENV<HOME>;
+sub R-bindings {
+	my @bindings;
+	@bindings.push($_) if .IO.e for <
+		/etc/host.conf
+		/etc/hosts
+		/etc/hosts.equiv
+		/etc/mtab
+		/etc/netgroup
+		/etc/networks
+		/etc/passwd
+		/etc/group
+		/etc/nsswitch.conf
+		/etc/resolv.conf
+		/etc/localtime
+		/dev/
+		/sys/
+		/proc/
+		/tmp/
+		/run/
+		/var/run/dbus/system_bus_socket	>,
+		%*ENV<HOME>;
 
-my @S-bindings = <
-	/etc/host.conf
-	/etc/hosts
-	/etc/nsswitch.conf
-	/dev/
-	/sys/
-	/proc/
-	/tmp/ >,
-	%*ENV<HOME>;
+	return @bindings;
+}
+
+sub S-bindings {
+	my @bindings;
+	@bindings.push($_) if .IO.e for <
+		/etc/host.conf
+		/etc/hosts
+		/etc/nsswitch.conf
+		/etc/resolv.conf
+		/dev/
+		/sys/
+		/proc/
+		/tmp/
+		/run/shm >,
+		%*ENV<HOME>;
+
+	return @bindings;
+}
 
 our sub new-config-from-arguments(@arguments --> Config) is export {
 	my Config $config .= new;
@@ -142,7 +156,7 @@ END
 		Param.new(
 			switches	=> < -R >,
 			callback	=> sub { $config.set-rootfs($^path);
-						 $config.add-bindings(@R-bindings) },
+						 $config.add-bindings(R-bindings) },
 			description	=> q:c:to/END/,
 Use $path as virtual rootfs + bind some files/directories.
 
@@ -150,20 +164,20 @@ Programs will be executed from, and confined into the virtual rootfs
 specified by $path.  Although a set of files and directories from the
 actual rootfs will still be visible within the virtual rootfs.  These
 files and directories typically contains information that are likely
-required by virtual programs: { do for @R-bindings { "\n    - $_" } }
+required by virtual programs: { do for R-bindings() { "\n    - $_" } }
 END
 		),
 		Param.new(
 			switches	=> < -S >,
 			callback	=> sub { $config.set-rootfs($^path);
-						 $config.add-bindings(@S-bindings);
+						 $config.add-bindings(S-bindings);
 						 $config.root-id = True },
 			description	=> q:c:to/END/,
 Use $path as virtual rootfs + bind some files/directories + fake "root".
 
 This option is similar to "-0 -R" but it makes visible within the
 virtual rootfs a smaller set of files and directories from the actual
-rootfs (to avoid unexpected changes): { do for @S-bindings { "\n    - $_" } }
+rootfs (to avoid unexpected changes): { do for S-bindings() { "\n    - $_" } }
 
 This option is useful to create and install packages into the virtual
 rootfs.
