@@ -80,7 +80,7 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 	multi sub paths(IO() $path where * cmp '/' === Same) { return $path }
 	multi sub paths(IO() $path) { return paths($path.parent), $path }
 
-	.mkdir if ! .e for paths($destination.parent);
+	.mkdir.e if ! .e for paths($destination.parent);
 
 	given $source {
 		when .f { open(~$destination, :a).close }
@@ -89,7 +89,8 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 	}
 
 	CATCH {
-		die X::Kains.new(:works-with-proot, message => .message);
+		die X::Kains.new(:works-with-proot, message =>
+"Error when creating placeholder '$source -> $destination': { .message }");
 	}
 }
 

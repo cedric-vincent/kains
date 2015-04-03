@@ -40,8 +40,8 @@ sub R-bindings {
 		/sys/
 		/proc/
 		/tmp/
-		/run/
-		/var/run/dbus/system_bus_socket	>,
+		/run/ >,
+# NYI		/var/run/dbus/system_bus_socket	>,
 		%*ENV<HOME>;
 
 	return @bindings;
