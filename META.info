@@ -19,4 +19,5 @@
   "support" : {
     "source" : ""
   }
+  "source-url" : "git://github.com/cedric-vincent/kains.git"
 }
