@@ -10,7 +10,7 @@
   "depends" : [ ],
   "provides" : {
     "App::Kains::Config" : "lib/App/Kains/Config.pm6",
-    "App::Kains::Command-line" : "lib/App/Kains/Commandline.pm6",
+    "App::Kains::Commandline" : "lib/App/Kains/Commandline.pm6",
     "App::Kains::Native" : "lib/App/Kains/Native.pm6",
     "App::Kains::Parameters" : "lib/App/Kains/Parameters.pm6",
     "App::Kains::Core" : "lib/App/Kains/Core.pm6",
