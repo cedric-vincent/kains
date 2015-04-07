@@ -31,48 +31,46 @@ class X::Errno is Exception is export {
 
 		my @arguments = @!arguments.map: {
 			when Str { qq/"$_"/		}
-			when Int { '0x' ~ $_.base(16)	}
+			when Int { '0x' ~ .base(16)	}
 			default	 { $_			}
 		}
 
-		$!function.name ~ '(' ~ @arguments.join(', ') ~ '): ' ~ strerror($!errno);
+		$!function.name ~ '(' ~ @arguments.join(', ') ~ '): ' ~ strerror $!errno;
 	}
 }
 
-sub raise-errno-on(Callable $condition, $function, *@arguments) {
+sub raise-errno-on(Code $condition, Code $function, *@arguments --> Any) {
 	my $result = $function(|@arguments);
-
 	if $condition($result) {
 		my $errno = cglobal('libc.so.6', 'errno', int);
-		die X::Errno.new(:$function, :@arguments, :$errno);
+		die X::Errno.new: :$function, :@arguments, :$errno;
 	}
-
-	return $result;
+	$result;
 }
 
 sub unshare(int $flags) is export {
 	sub unshare(int --> int) is native { * }
-	raise-errno-on(* < 0, &unshare, $flags);
+	raise-errno-on * < 0, &unshare, $flags;
 }
 
 sub mount(Str() $source, Str() $target, Str $type, int $flags, Str $data) is export {
 	sub mount(Str, Str, Str, int, Str --> int) is native { * }
-	raise-errno-on(* < 0, &mount, $source, $target, $type, $flags, $data);
+	raise-errno-on * < 0, &mount, $source, $target, $type, $flags, $data;
 }
 
 sub umount2(Str() $path, int $flags) is export {
 	sub umount2(Str, int --> int) is native { * }
-	raise-errno-on(* < 0, &umount2, $path, $flags);
+	raise-errno-on * < 0, &umount2, $path, $flags;
 }
 
 sub chroot(Str() $path) is export {
 	sub chroot(Str --> int) is native { * }
-	raise-errno-on(* < 0, &chroot, $path);
+	raise-errno-on * < 0, &chroot, $path;
 }
 
 sub personality(int $flags --> int) is export {
 	sub personality(int --> int) is native { * }
-	raise-errno-on(* < 0, &personality, $$flags);
+	raise-errno-on * < 0, &personality, $flags;
 }
 
 sub getuid(--> int) is native is export { * }

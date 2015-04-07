@@ -23,9 +23,6 @@ use App::Kains::Parameters;
 use App::Kains::Core;
 
 our sub start(*@arguments --> Int) {
-	my $config = new-config-from-arguments(@arguments);
-	return launch($config).exit;
-
 	CATCH {
 		when X::Command-line {
 			die X::Kains.new(message => qq:to/END/
@@ -35,4 +32,7 @@ our sub start(*@arguments --> Int) {
 			);
 		}
 	}
+
+	my $config = new-config-from-arguments(@arguments);
+	launch($config).exit;
 }

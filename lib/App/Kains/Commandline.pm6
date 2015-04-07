@@ -20,10 +20,10 @@
 module App::Kains::Command-line;
 
 class Param is export {
-	has Str @.switches;
-	has Callable $.callback;
-	has Str @.examples;
-	has Str $.description;
+	has Str  @.switches;
+	has Code $.callback;
+	has Str  @.examples;
+	has Str  $.description;
 }
 
 class X::Command-line is Exception {
@@ -33,27 +33,32 @@ class X::Command-line is Exception {
 
 	method message {
 		my Str $message = "Error while processing \"$!switch\": $!message";
-
-		if $!parameter.defined {
-			for $!parameter.examples {
-				FIRST { $message ~= "\nHere follow some examples for this switch:" }
-				$message ~= "\n\t$!switch $_";
-			}
+		if $!parameter.?examples {
+			$message ~= "\nHere follow some examples for this switch:";
+			$message ~= "\n\t$!switch $_" for $!parameter.examples;
 		}
-
-		return $message;
+		$message;
 	}
 }
 
 class Interface is export {
 	has Param @.parameters;
 
-	method parse(@arguments --> int) {
+	method parse(@arguments --> Real) { # returns an Int or Inf.
 		my $index = 0;
 		loop (; $index < @arguments; $index++) {
-			my $switch = @arguments[$index];
+			my ($switch, $parameter);
 
-			my $parameter = @.parameters.first({ any(.switches) === $switch });
+			CATCH {
+				when X::AdHoc {
+					die X::Command-line.new: :$parameter, :$switch,
+								 message => .message;
+				}
+			}
+
+			$switch = @arguments[$index];
+
+			$parameter = @.parameters.first: { $switch === any .switches };
 			if ! $parameter.defined {
 				die 'unknown switch' if $switch ~~ /^'-'/;
 				return $index;
@@ -61,24 +66,17 @@ class Interface is export {
 
 			my @callback-args;
 			if $parameter.callback.count > 0 {
-				my $old-index = $index;
-				$index += $parameter.callback.count;
-
-				@callback-args = @arguments[$old-index + 1 ... $index];
-				die 'missing parameter' if ! all(@callback-args».defined)
-							or @callback-args == 0;
+				my $new-index = $index + $parameter.callback.count;
+				@callback-args = @arguments[$index + 1 ... $new-index];
+				die 'missing parameter' if ! @callback-args
+							or ! all @callback-args».defined;
+				$index = $new-index;
 			}
 
 			$parameter.callback.(|@callback-args);
-
-			CATCH {
-				when X::AdHoc {
-					die X::Command-line.new(:$parameter, :$switch, message => .message);
-				}
-			}
 		}
 
-		return $index;
+		$index;
 	}
 
 	method print-long-help {
@@ -95,7 +93,7 @@ class Interface is export {
 			say "    $_" for .description.lines;
 
 			for .examples -> $example {
-				FIRST { say "\n    Some examples:" }
+				FIRST { say "\n    Some examples:\n" }
 				say "        " ~ .switches[0] ~ " $example";
 			}
 
@@ -104,8 +102,7 @@ class Interface is export {
 	}
 
 	method print-short-help {
-		say 'Usage: kains [options] ... [command]';
-		say '';
+		say "Usage: kains [options] ... [command]\n";
 
 		my @items;
 		for @.parameters {
@@ -114,13 +111,13 @@ class Interface is export {
 					description	=> .description.lines[0] }
 		}
 
-		my $first-row-length = max(@items.map({ .<switch>.chars + .<params>.chars + 1}));
+		my $first-row-length = max @items.map: { .<switch>.chars + .<params>.chars + 1};
 
 		for @items {
 			my $first-row = .<switch> ~ do { ' ' ~ .<params> if .<params>.chars };
 
 			print $first-row;
-			print ' ' xx ($first-row-length - $first-row.chars);
+			print ' ' xx $first-row-length - $first-row.chars;
 			print '  ';
 			say .<description>;
 		}

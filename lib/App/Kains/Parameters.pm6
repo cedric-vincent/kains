@@ -44,7 +44,7 @@ sub R-bindings {
 # NYI		/var/run/dbus/system_bus_socket	>,
 		%*ENV<HOME>;
 
-	return @bindings;
+	@bindings;
 }
 
 sub S-bindings {
@@ -61,7 +61,7 @@ sub S-bindings {
 		/run/shm >,
 		%*ENV<HOME>;
 
-	return @bindings;
+	@bindings;
 }
 
 our sub new-config-from-arguments(@arguments --> Config) is export {
@@ -71,9 +71,9 @@ our sub new-config-from-arguments(@arguments --> Config) is export {
 		Param.new(
 			switches	=> < -r --rootfs >,
 			callback	=> sub { $config.set-rootfs($^path) },
-			examples	=> ( %*ENV<HOME> ~ '/rootfs/centos-6-x86',
-					     '/tmp/ubuntu-12.04-x86_64',
-					     $config.rootfs ~ '  (default)' ),
+			examples	=> « ~/rootfs/centos-6-x86
+					     /tmp/ubuntu-12.04-x86_64
+					     "{ $config.rootfs }  (default)" »,
 			description	=> q:to/END/,
 Use $path as the new root file-system, aka. virtual rootfs.
 
@@ -90,7 +90,7 @@ END
 		Param.new(
 			switches	=> < -b -m --bind --mount >,
 			callback	=> sub { $config.add-binding($^path) },
-			examples	=> ( '/proc', '/dev' , %*ENV<HOME>),
+			examples	=> < /proc /dev $HOME >,
 			description	=> q:to/END/,
 Make $path visible from the virtual rootfs, at the same location.
 
@@ -102,9 +102,9 @@ END
 		Param.new(
 			switches	=> < -B -M --bind-elsewhere --mount-elsewhere >,
 			callback	=> sub ($path, $location) { $config.add-binding($path, $location) },
-			examples	=> ( %*ENV<HOME> ~ '/my_hosts /etc/hosts',
-					     '/tmp/opt /opt',
-					     '/bin/bash /bin/sh' ),
+			examples	=> « '~/my_hosts /etc/hosts'
+					     '/tmp/opt /opt'
+					     '/bin/bash /bin/sh' »,
 			description	=> q:to/END/,
 Make $path visible from the virtual rootfs, at the given $location.
 
@@ -117,9 +117,9 @@ END
 		Param.new(
 			switches	=> < -w --pwd --cwd --working-directory >,
 			callback	=> sub { $config.cwd = $^path },
-			examples	=> ( '/tmp',
-					     $config.cwd ~ '  (first default)',
-					     '/  (second default)' ),
+			examples	=> « /tmp
+					     "{ $config.cwd }  (first default)"
+					     '/  (second default)' »,
 			description	=> q:to/END/,
 Set the initial working directory to $path.
 
@@ -164,7 +164,8 @@ Programs will be executed from, and confined within the virtual rootfs
 specified by $path.  Although a set of files and directories of the
 actual rootfs will still be visible from the virtual rootfs.  These
 files and directories contain information that are likely required by
-virtual programs:{ do for R-bindings() { "\n    - $_" } }
+virtual programs:
+{ do for R-bindings() { "\n    * $_" } }
 END
 		),
 		Param.new(
@@ -177,7 +178,8 @@ Use $path as virtual rootfs + bind some files/directories + fake "root".
 
 This option is similar to "-0 -R" but it makes visible from the
 virtual rootfs a smaller set of files and directories of the actual
-rootfs (to avoid unexpected changes): { do for S-bindings() { "\n    - $_" } }
+rootfs (to avoid unexpected changes):
+{ do for S-bindings() { "\n    * $_" } }
 
 This option is useful to create and install packages into the virtual
 rootfs.
@@ -193,9 +195,9 @@ END
 		Param.new(
 			switches	=> < -- >,
 			callback	=> sub (*@command) { $config.command = @command },
-			examples	=> ( 'emacs',
-					     '/usr/bin/wget',
-					     $config.command ~ '  (default)' ),
+			examples	=> « emacs
+					     /usr/bin/wget
+					     "{ $config.command }  (default)" »,
 			description	=> q:to/END/,
 Launch @command in the virtual environment.
 
@@ -215,5 +217,5 @@ END
 		when $_ < +@arguments { $config.command = @arguments[$_ ... *] }
 	}
 
-	return $config;
+	$config;
 }

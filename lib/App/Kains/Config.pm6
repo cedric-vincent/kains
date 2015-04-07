@@ -20,12 +20,12 @@
 module App::Kains::Config;
 
 class Config is export {
-	has Str $.rootfs	= '/';
-	has Enum @.bindings	= ();
-	has Str $.cwd is rw	= ~$*CWD;
+	has Str $.rootfs	 = '/';
+	has Enum @.bindings	 = ();
+	has Str $.cwd is rw	 = ~$*CWD;
 	has Bool $.root-id is rw = False;
 	has Bool $.mode32 is rw  = False;
-	has Str @.command	= < /bin/sh -l >;
+	has Str @.command	 = < /bin/sh -l >;
 
 	method set-rootfs(Str $path) {
 		given $path.IO {
@@ -52,8 +52,6 @@ class Config is export {
 	}
 
 	method add-bindings(*@paths) {
-		for @paths {
-			$.add-binding($_);
-		}
+		$.add-binding($_) for @paths;
 	}
 }
