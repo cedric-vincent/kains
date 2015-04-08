@@ -83,7 +83,7 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 	multi sub paths(IO() $path where * cmp '/' === Same) { $path }
 	multi sub paths(IO() $path) { paths($path.parent), $path }
 
-	.mkdir.e if ! .e for paths $destination.parent;
+	.mkdir if ! .e for paths $destination.parent;
 
 	given $source {
 		when .f { close open ~$destination, :a }
