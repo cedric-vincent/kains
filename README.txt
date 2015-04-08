@@ -342,10 +342,15 @@ is to use rakudobrew:
     [...]
     $ rakudobrew build-panda
     [...]
+    $ panda install ufo
+    [...]
 
 Then, Kains can be installed that way:
 
-    $ panda install Kains
+    $ git clone https://github.com/cedric-vincent/kains
+    $ cd kains
+    $ ufo
+    $ make install
     [...]
     $ export PATH=~/.rakudobrew/moar-nom/install/share/perl6/site/bin:$PATH
 
