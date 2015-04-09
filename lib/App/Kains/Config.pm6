@@ -25,6 +25,7 @@ class Config is export {
 	has Str $.cwd is rw	 = ~$*CWD;
 	has Bool $.root-id is rw = False;
 	has Bool $.mode32 is rw  = False;
+	has Bool $.verbose is rw = False;
 	has Str @.command	 = < /bin/sh -l >;
 
 	method set-rootfs(Str $path) {

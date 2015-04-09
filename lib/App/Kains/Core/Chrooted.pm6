@@ -61,10 +61,17 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 
 our sub mount-bindings(Str $actual-rootfs, Config $config) is export {
 	for $config.bindings {
+		FIRST {
+			say qq<Info: using "$actual-rootfs" as temporary mount point, bindings are:>
+				if $config.verbose;
+		}
+
 		my IO::Path $source	 .= new: $actual-rootfs ~ .key;
 		my IO::Path $destination .= new: .value.IO.resolve;
 
 		create-placeholder $source, $destination;
+
+		say "\t{.key} -> $destination" if $config.verbose;
 
 		mount $source, $destination, '', MS_PRIVATE +| MS_BIND +| MS_REC, '';
 	}

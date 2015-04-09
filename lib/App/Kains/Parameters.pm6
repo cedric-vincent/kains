@@ -143,6 +143,13 @@ original user and group identities.
 END
 		),
 		Param.new(
+			switches	=> < -v --verbose >,
+			callback	=> sub { $config.verbose = True },
+			description	=> q:to/END/,
+Show a couple of internal information during execution.
+END
+		),
+		Param.new(
 			switches	=> < --32 --32bit --32bit-mode >,
 			callback	=> sub { $config.mode32 = True },
 			description	=> q:to/END/,

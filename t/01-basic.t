@@ -20,7 +20,7 @@
 use v6;
 use Test;
 
-plan 28;
+plan 30;
 
 use App::Kains;
 
@@ -51,6 +51,11 @@ for < -w --pwd --cwd --working-directory > {
 for < -0 --root-id > {
 	is App::Kains::start(« $_ sh -c 'id -u | grep -qx 0' »), 0, "use $_ option";
 	is App::Kains::start(« $_ sh -c 'id -g | grep -qx 0' »), 0, "use $_ option";
+}
+
+for < -v --verbose > {
+	is App::Kains::start(« $_ true' »), 0, "use $_ option";
+	is App::Kains::start(« $_ true' »), 0, "use $_ option";
 }
 
 for < --32 --32bit --32bit-mode > {
