@@ -76,8 +76,12 @@ doesn't match its type in the actual rootfs.]];
 multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 {
 	CATCH {
-		die X::Kains.new: :works-with-proot, message =>
-			"Error when creating placeholder '$source -> $destination': { .message }"
+		when X::IO::Mkdir
+		  or X::AdHoc
+		  or X::NYI {
+			die X::Kains.new: :works-with-proot, message =>
+				"Error when creating placeholder '$source -> $destination': { .message }"
+		}
 	}
 
 	multi sub paths(IO() $path where * cmp '/' === Same) { $path }
