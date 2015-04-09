@@ -20,7 +20,7 @@
 use v6;
 use Test;
 
-plan 1;
+plan 2;
 
 use App::Kains;
 
@@ -44,7 +44,7 @@ mkdir $tmp-does-exist;
 is App::Kains::start(« -B $tmp-does-exist $tmp-does-not-exist true »), 0,
    'bind to non-existent local destination';
 
-# is App::Kains::start(« -B $tmp-does-exist "/tmp/$tmp-does-not-exist-too/whatever" true »), 0,
-#    'bind into non-existent parent directory';
+is App::Kains::start(« -B $tmp-does-exist "/tmp/$tmp-does-not-exist-too/whatever" true »), 0,
+   'bind into non-existent parent directory';
 
 rmdir $tmp-does-exist;
