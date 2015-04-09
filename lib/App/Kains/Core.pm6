@@ -95,7 +95,7 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 sub mount-bindings(Str $actual-rootfs, Config $config) {
 	for $config.bindings {
 		my IO::Path $source	 .= new: $actual-rootfs ~ .key;
-		my IO::Path $destination .= new: .value;
+		my IO::Path $destination .= new: .value.IO.resolve;
 
 		create-placeholder $source, $destination;
 
