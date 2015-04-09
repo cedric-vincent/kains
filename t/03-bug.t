@@ -20,7 +20,7 @@
 use v6;
 use Test;
 
-plan 2;
+plan 4;
 
 use App::Kains;
 
@@ -48,3 +48,21 @@ is App::Kains::start(« -B $tmp-does-exist "/tmp/$tmp-does-not-exist-too/whateve
    'bind into non-existent parent directory';
 
 rmdir $tmp-does-exist;
+
+my $tmp1 = "/tmp/{ tmp-name }";
+my $tmp2 = "/tmp/{ tmp-name }";
+my $tmp = tmp-name;
+
+mkdir $tmp2;
+mkdir $tmp1;
+mkdir "$tmp1/$tmp";
+
+is App::Kains::start(« -B /etc $tmp2 -B /bin $tmp2 -B $tmp1 $tmp2 test -e "$tmp2/$tmp" »), 0,
+   'several bindings to the same location, the last one wins';
+
+is App::Kains::start(« -B /etc "$tmp1/$tmp" -B $tmp2 $tmp1 test -e "$tmp1/$tmp/fstab" »), 0,
+   'binding locations are ordered';
+
+rmdir "$tmp1/$tmp";
+rmdir $tmp1;
+rmdir $tmp2;
