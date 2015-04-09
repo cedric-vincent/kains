@@ -6,18 +6,23 @@
   "build-depends" : [
     "NativeCall"
   ],
-  "test-depends" : [ ],
-  "depends" : [ ],
+  "test-depends" : [
+    "Test"
+  ],
+  "depends" : [
+    "NativeCall"
+  ],
   "provides" : {
     "App::Kains::Config" : "lib/App/Kains/Config.pm6",
     "App::Kains::Commandline" : "lib/App/Kains/Commandline.pm6",
     "App::Kains::Native" : "lib/App/Kains/Native.pm6",
     "App::Kains::Parameters" : "lib/App/Kains/Parameters.pm6",
+    "App::Kains::X" : "lib/App/Kains/X.pm6",
+    "App::Kains::Core::Chrooted" : "lib/App/Kains/Core/Chrooted.pm6",
     "App::Kains::Core" : "lib/App/Kains/Core.pm6",
     "App::Kains" : "lib/App/Kains.pm6"
   },
   "support" : {
-    "source" : ""
-  },
-  "source-url" : "git://github.com/cedric-vincent/kains.git"
+    "source" : "git://github.com/cedric-vincent/kains.git"
+  }
 }
