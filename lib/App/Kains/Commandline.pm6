@@ -60,7 +60,7 @@ class Interface is export {
 
 			$parameter = @.parameters.first: { $switch === any .switches };
 			if ! $parameter.defined {
-				die 'unknown switch' if $switch ~~ /^'-'/;
+				die 'unknown switch' if $switch.starts-with: '-';
 				return $index;
 			}
 

@@ -72,7 +72,7 @@ our sub mount-bindings(Str $actual-rootfs, Config $config) is export {
 		my IO::Path $source	 .= new: .key;
 		my IO::Path $destination .= new: .value;
 
-		say "\t $source -> $destination" if $config.verbose;
+		say "	$source -> $destination" if $config.verbose;
 
 		create-placeholder $source, $destination;
 

@@ -39,7 +39,7 @@ sub set-gid-mapping(int :$old-gid, int :$new-gid) {
 }
 
 sub mount-actual-rootfs(Config $config --> Str) {
-	return '/' but False if $config.rootfs === '/';
+	return '' if $config.rootfs === '/';
 
 	my Str $actual-rootfs = '/.kains-' ~ getpid;
 
