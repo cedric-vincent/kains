@@ -25,7 +25,7 @@ use App::Kains::Core;
 our sub start(*@arguments --> Int) {
 	CATCH {
 		when X::Command-line {
-			die X::Kains.new(message => qq:to/END/
+			die X::Kains.new(message => qq:to<END>
 				{ .message }
 				Please, have a look at the --help option.
 				END

@@ -80,24 +80,19 @@ class Interface is export {
 	}
 
 	method print-long-help {
-		say q:to/END/;
+		say q:to<END>;
 		    Command-line interface
 		    ----------------------
 		    END
 
 		for @.parameters {
-			for .switches -> $switch {
-				say "$switch " ~ .callback.signature.params».name;
-			}
-
-			say "    $_" for .description.lines;
-
-			for .examples -> $example {
-				FIRST { say "\n    Some examples:\n" }
-				say "        " ~ .switches[0] ~ " $example";
-			}
-
-			print "\n";
+			say "$_ { .callback.signature.params».name }"	for .switches;
+			say "    $_"					for .description.lines;
+			say ""						if .examples;
+			say "    Some examples:"			if .examples;
+			say ""						if .examples;
+			say "        { .switches[0] } $_"		for .examples;
+			say "";
 		}
 	}
 

@@ -74,7 +74,7 @@ our sub new-config-from-arguments(@arguments --> Config) is export {
 			examples	=> « ~/rootfs/centos-6-x86
 					     /tmp/ubuntu-12.04-x86_64
 					     "{ $config.rootfs }  (default)" »,
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Use $path as the new root file-system, aka. virtual rootfs.
 
 Programs will be executed from, and confined within the virtual rootfs
@@ -91,7 +91,7 @@ END
 			switches	=> < -b -m --bind --mount >,
 			callback	=> sub { $config.add-binding($^path) },
 			examples	=> < /proc /dev $HOME >,
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Make $path visible from the virtual rootfs, at the same location.
 
 The content of $path will be made visible from the virtual rootfs.
@@ -105,7 +105,7 @@ END
 			examples	=> « '~/my_hosts /etc/hosts'
 					     '/tmp/opt /opt'
 					     '/bin/bash /bin/sh' »,
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Make $path visible from the virtual rootfs, at the given $location.
 
 The content of $path will be made visible at the given $location from
@@ -120,7 +120,7 @@ END
 			examples	=> « /tmp
 					     "{ $config.cwd }  (first default)"
 					     '/  (second default)' »,
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Set the initial working directory to $path.
 
 Some programs expect to be launched from a specific directory but they
@@ -131,7 +131,7 @@ END
 		Param.new(
 			switches	=> < -0 --root-id >,
 			callback	=> sub { $config.root-id = True },
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Set user and group identities virtually to "root/root".
 
 Some programs will refuse to work if they are not run with "root"
@@ -145,14 +145,14 @@ END
 		Param.new(
 			switches	=> < -v --verbose >,
 			callback	=> sub { $config.verbose = True },
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Show a couple of internal information during execution.
 END
 		),
 		Param.new(
 			switches	=> < --32 --32bit --32bit-mode >,
 			callback	=> sub { $config.mode32 = True },
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Make Linux declare itself and behave as a 32-bit kernel.
 
 Some programs launched within a 32-bit virtual rootfs might get
@@ -164,7 +164,7 @@ END
 			switches	=> < -R >,
 			callback	=> sub { $config.set-rootfs($^path);
 						 $config.add-bindings(R-bindings) },
-			description	=> q:c:to/END/,
+			description	=> q:c:to<END>,
 Use $path as virtual rootfs + bind some files/directories.
 
 Programs will be executed from, and confined within the virtual rootfs
@@ -180,7 +180,7 @@ END
 			callback	=> sub { $config.set-rootfs($^path);
 						 $config.add-bindings(S-bindings);
 						 $config.root-id = True },
-			description	=> q:c:to/END/,
+			description	=> q:c:to<END>,
 Use $path as virtual rootfs + bind some files/directories + fake "root".
 
 This option is similar to "-0 -R" but it makes visible from the
@@ -195,7 +195,7 @@ END
 		Param.new(
 			switches	=> < -h --help --usage >,
 			callback	=> sub { $cli.print-long-help; exit 1 },
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Print the help message, then exit.
 END
 		),
@@ -205,7 +205,7 @@ END
 			examples	=> « emacs
 					     /usr/bin/wget
 					     "{ $config.command }  (default)" »,
-			description	=> q:to/END/,
+			description	=> q:to<END>,
 Launch @command in the virtual environment.
 
 This option is only syntactic sugar since it is possible to specify
