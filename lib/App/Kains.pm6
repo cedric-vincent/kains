@@ -34,5 +34,5 @@ our sub start(*@arguments --> Int) {
 	}
 
 	my $config = new-config-from-arguments(@arguments);
-	launch($config).exit;
+	launch($config).exitcode;
 }
