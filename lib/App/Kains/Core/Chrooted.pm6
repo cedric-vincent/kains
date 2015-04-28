@@ -60,17 +60,18 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 }
 
 our sub mount-bindings(Str $actual-rootfs, Config $config) is export {
-	my @sorted-bindings = sort *.value, $config.bindings.map: {
-						Enum.new: key   => $actual-rootfs ~ .key,
-							  value => .value.IO.resolve };
+	my @sorted-bindings = sort *.value.chars,
+				$config.bindings.map: {
+					Enum.new: key   => IO::Path.new($actual-rootfs ~ .key),
+						  value => IO::Path.new(.value.IO.resolve) };
 	for @sorted-bindings {
 		FIRST {
 			say qq<Info: using "$actual-rootfs" as temporary mount point, bindings are:>
 				if $config.verbose;
 		}
 
-		my IO::Path $source	 .= new: .key;
-		my IO::Path $destination .= new: .value;
+		my $source	::= .key;
+		my $destination ::= .value;
 
 		say "	$source -> $destination" if $config.verbose;
 
