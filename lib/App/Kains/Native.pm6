@@ -30,7 +30,7 @@ class X::Errno is Exception is export {
 		sub strerror(int $errno --> Str) is native { * }
 
 		my @arguments = @!arguments.map: {
-			when Str { qq/"$_"/		}
+			when Str { qq<"$_">		}
 			when Int { '0x' ~ .base(16)	}
 			default	 { $_			}
 		}

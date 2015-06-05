@@ -31,9 +31,10 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination
 multi sub create-placeholder(IO::Path $source, IO::Path $destination
 	where {    $destination.f and ! $source.f
 		or $destination.d and ! $source.d }) {
-	die X::Kains.new: :works-with-proot, message =>
-qq[[Error: can't mount/bind "$destination", its type in the virtual rootfs
-doesn't match its type in the actual rootfs.]];
+	die X::Kains.new: :works-with-proot, message => q:to<END>;
+		Error: can't mount/bind "$destination", its type in the virtual rootfs
+		doesn't match its type in the actual rootfs.
+		END
 }
 
 multi sub create-placeholder(IO::Path $source, IO::Path $destination)
