@@ -24,16 +24,16 @@ plan 7;
 
 {
 	use App::Kains;
-	throws_like { App::Kains::start('/this/does/not/exist') }, X::Kains, 'not such file';
-	throws_like { App::Kains::start(< -B /etc /etc/fstab >) }, X::Kains, 'incompatible file type';
+	throws-like { App::Kains::start('/this/does/not/exist') }, X::Kains, 'not such file';
+	throws-like { App::Kains::start(< -B /etc /etc/fstab >) }, X::Kains, 'incompatible file type';
 }
 
 {
 	use App::Kains::Commandline;
 
-	throws_like { Interface.new.parse(['-a']) }, X::Command-line, 'unknown switch';
+	throws-like { Interface.new.parse(['-a']) }, X::Command-line, 'unknown switch';
 
-	throws_like { Interface.new(parameters =>
+	throws-like { Interface.new(parameters =>
 			( Param.new(callback => sub ($a) { !!! } ))).parse(['-a']) },
 			X::Command-line, 'missing parameter';
 }
@@ -41,11 +41,11 @@ plan 7;
 {
 	use App::Kains::Config;
 
-	dies_ok { Config.new.set-rootfs('/this/does/not/exist') }, 'invalid rootfs';
-	dies_ok { Config.new.add-binding('/this/does/not/exist', 'whatever') }, 'invalid mount source';
+	dies-ok { Config.new.set-rootfs('/this/does/not/exist') }, 'invalid rootfs';
+	dies-ok { Config.new.add-binding('/this/does/not/exist', 'whatever') }, 'invalid mount source';
 }
 
 {
 	use App::Kains::Native;
-	throws_like { chroot('/this/does/not/exist') }, X::Errno, 'native error';
+	throws-like { chroot('/this/does/not/exist') }, X::Errno, 'native error';
 }
