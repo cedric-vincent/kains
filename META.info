@@ -3,6 +3,7 @@
   "name" : "Kains",
   "description" : "Container tool based on Linux namespaces",
   "version" : "v0.0.1",
+  "source-url" : "git://github.com/cedric-vincent/kains.git",
   "build-depends" : [
     "NativeCall"
   ],
@@ -21,8 +22,5 @@
     "App::Kains::Core::Chrooted" : "lib/App/Kains/Core/Chrooted.pm6",
     "App::Kains::Core" : "lib/App/Kains/Core.pm6",
     "App::Kains" : "lib/App/Kains.pm6"
-  },
-  "support" : {
-    "source" : "git://github.com/cedric-vincent/kains.git"
   }
 }
