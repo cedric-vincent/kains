@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::Native;
+unit module App::Kains::Native;
 
 use NativeCall;
 

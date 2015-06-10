@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::Core::Chrooted;
+unit module App::Kains::Core::Chrooted;
 
 use App::Kains::Config;
 use App::Kains::Native;

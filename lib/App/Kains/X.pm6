@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::X;
+unit module App::Kains::X;
 
 class X::Kains is Exception is export {
 	has Str $.message;

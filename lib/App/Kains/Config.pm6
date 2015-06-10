@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::Config;
+unit module App::Kains::Config;
 
 class Config is export {
 	has Str $.rootfs	 = '/';

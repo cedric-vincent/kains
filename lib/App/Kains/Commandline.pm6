@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::Command-line;
+unit module App::Kains::Command-line;
 
 class Param is export {
 	has Str  @.switches;
