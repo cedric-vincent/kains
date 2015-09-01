@@ -49,7 +49,7 @@ sub mount-actual-rootfs(Config $config --> Str) {
 	$actual-rootfs;
 }
 
-our sub launch(Config $config --> Proc::Status) is export {
+our sub launch(Config $config --> Proc) is export {
 	CATCH {
 		when X::Errno {
 			my Str $message = "Error: { .message }";

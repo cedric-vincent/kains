@@ -49,7 +49,7 @@ multi sub create-placeholder(IO::Path $source, IO::Path $destination)
 	}
 
 	multi sub paths(IO() $path where * cmp '/' === Same) { $path }
-	multi sub paths(IO() $path) { paths($path.parent), $path }
+	multi sub paths(IO() $path) { |paths($path.parent), $path }
 
 	.mkdir if ! .e for paths $destination.parent;
 

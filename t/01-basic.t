@@ -66,6 +66,6 @@ is App::Kains::start(< -R / true >), 0, "use -R option";
 
 is App::Kains::start(« -S / sh -c 'id -g | grep -qx 0' »), 0, "use -S option";
 
-my $nonexistent-path = '/tmp/kains-' ~ (('a'..'z', 'A'..'Z', 0..9).pick xx 30).join;
+my $nonexistent-path = '/tmp/kains-' ~ pick(30, 'a'..'z', 'A'..'Z', 0..9).join;
 is App::Kains::start(« -B /dev $nonexistent-path test -d $nonexistent-path »), 0,
 	'mount/bind to nonexistent location';

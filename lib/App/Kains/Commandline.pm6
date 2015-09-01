@@ -59,7 +59,7 @@ class Interface is export {
 			$switch = @arguments[$index];
 
 			$parameter = @.parameters.first: { $switch === any .switches };
-			if ! $parameter.defined {
+			without $parameter {
 				die 'unknown switch' if $switch.starts-with: '-';
 				return $index;
 			}
@@ -85,13 +85,13 @@ class Interface is export {
 		    ----------------------
 		    END
 
-		for @.parameters {
-			say "$_ { .callback.signature.params».name }"	for .switches;
-			say "    $_"					for .description.lines;
-			say ""						if .examples;
-			say "    Some examples:"			if .examples;
-			say ""						if .examples;
-			say "        { .switches[0] } $_"		for .examples;
+		for @.parameters -> $p {
+			say "$_ { $p.callback.signature.params».name }"	for $p.switches;
+			say "    $_"					for $p.description.lines;
+			say ""						if  $p.examples;
+			say "    Some examples:"			if  $p.examples;
+			say ""						if  $p.examples;
+			say "        { $p.switches[0] } $_"		for $p.examples;
 			say "";
 		}
 	}
@@ -100,13 +100,13 @@ class Interface is export {
 		say "Usage: kains [options] ... [command]\n";
 
 		my @items;
-		for @.parameters {
-			@items.push: {	switch		=> .switches[0],
-					params		=> .callback.signature.params».name,
-					description	=> .description.lines[0] }
+		for @.parameters -> $p {
+			@items.push: ${	switch		=> $p.switches[0],
+					params		=> $p.callback.signature.params».name,
+					description	=> $p.description.lines[0] }
 		}
 
-		my $first-row-length = max @items.map: { .<switch>.chars + .<params>.chars + 1};
+		my $first-row-length = max @items.map: { .<switch>.chars + .<params>.chars + 1 };
 
 		for @items {
 			my $first-row = .<switch> ~ do { ' ' ~ .<params> if .<params>.chars };
