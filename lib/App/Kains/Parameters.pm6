@@ -17,7 +17,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA.
 
-module App::Kains::Parameters;
+unit module App::Kains::Parameters;
 
 use App::Kains::Config;
 use App::Kains::Commandline;
