@@ -99,11 +99,10 @@ class Interface is export {
 	method print-short-help {
 		say "Usage: kains [options] ... [command]\n";
 
-		my @items;
-		for @.parameters -> $p {
-			@items.push: ${	switch		=> $p.switches[0],
-					params		=> $p.callback.signature.params».name,
-					description	=> $p.description.lines[0] }
+		my @items = @.parameters.map: {
+			%( switch      => .switches[0],
+			   params      => .callback.signature.params».name,
+			   description => .description.lines[0] )
 		}
 
 		my $first-row-length = max @items.map: { .<switch>.chars + .<params>.chars + 1 };
