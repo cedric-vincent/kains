@@ -340,20 +340,15 @@ is to use rakudobrew:
     $ export PATH=~/.rakudobrew/bin:$PATH
     $ rakudobrew build moar
     [...]
-    $ rakudobrew build-panda
-    [...]
-    $ panda install ufo
-    [...]
 
-Then, Kains can be installed that way:
+Then, Kains can be used that way:
 
     $ git clone https://github.com/cedric-vincent/kains
     $ cd kains
-    $ ufo
-    $ make install
+    $ make
     [...]
-    $ export PATH=~/.rakudobrew/moar-nom/install/share/perl6/site/bin:$PATH
-
+    $ perl6 -Ilib ./bin/kains
+    [...]
 
 Rootfs
 ======
