@@ -58,7 +58,7 @@ class Interface is export {
 
 			$switch = @arguments[$index];
 
-			$parameter = @.parameters.first: { $switch === any .switches };
+			$parameter = @.parameters.first: { $switch eq any .switches };
 			without $parameter {
 				die 'unknown switch' if $switch.starts-with: '-';
 				return $index;

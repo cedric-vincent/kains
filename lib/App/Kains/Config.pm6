@@ -21,7 +21,7 @@ unit module App::Kains::Config;
 
 class Config is export {
 	has Str $.rootfs	 = '/';
-	has Enum @.bindings	 = ();
+	has Pair @.bindings	 = ();
 	has Str $.cwd is rw	 = ~$*CWD;
 	has Bool $.root-id is rw = False;
 	has Bool $.mode32 is rw  = False;
